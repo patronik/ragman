@@ -59,12 +59,11 @@ router.post('/search',
       const queryVector = await vectorizeText(prompt);
       const result = await pool.query(
         `
-        SELECT id, name, embedding, embedding <-> $1 AS distance
+        SELECT id, name, embedding, embedding <-> '${JSON.stringify(queryVector)}' AS distance
         FROM vectors
         ORDER BY distance ASC
         LIMIT 5;
-      `,
-        [queryVector]
+      `        
       );
       res.status(200).send(result.rows);
     } catch (err) {
