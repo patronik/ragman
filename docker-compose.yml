@@ -8,7 +8,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRESS_USERNAME}:${POSTGRESS_PASSWORD}@postgresql:5432/${POSTGRESS_DBNAME}
   chatbot:
-    build: .
+    build: ./chatbot
     ports:
       - "${CHAT_APP_PORT}:${CHAT_APP_PORT}"
     environment:
