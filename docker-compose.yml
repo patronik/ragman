@@ -14,10 +14,21 @@ services:
       POSTGRES_PASSWORD: ${POSTGRESS_PASSWORD}
       POSTGRES_DB: ${POSTGRESS_DBNAME}
     volumes:
-      - db_data:/var/lib/postgresql/data       
+      - postgresql_data:/var/lib/postgresql/data       
       - ./embedding/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"    
-
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgresql
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 volumes:
-  db_data:
+  postgresql_data:
+  pgadmin_data:

@@ -5,17 +5,6 @@ import { vectorizeText } from '../utils/vectorizer.js';
 
 const router = express.Router();
 
-// Read all vectors
-router.get('/list', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM vectors;');
-    res.status(200).send(result.rows);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({ error: 'Error fetching vectors.' });
-  }
-});
-
 // Create a vector entry
 router.post('/create',
   body('name').notEmpty().withMessage('Name parameter is required'),
@@ -132,6 +121,17 @@ router.post('/delete',
       console.log(err);
       res.status(500).send({ error: 'Error deleting vector.' });
     }
+});
+
+// Read all vectors
+router.get('/list', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM vectors;');
+    res.status(200).send(result.rows);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ error: 'Error fetching vectors.' });
+  }
 });
 
 export default router;
