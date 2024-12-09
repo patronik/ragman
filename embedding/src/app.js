@@ -12,5 +12,5 @@ app.use(bodyParser.json());
 app.use('/vector', vectorRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

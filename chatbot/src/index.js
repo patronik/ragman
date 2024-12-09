@@ -4,9 +4,19 @@ import express from 'express';
 import { getJobDocuments } from './services/jobService.js';
 import { getChatResponse } from './services/chatService.js';
 import { saveChatHistory, getChatHistory } from './utils/historyManager.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 const app = express();
 app.use(express.json());
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.get('/chat', async (req, res) => {
+    res.render('chat');
+});
 
 app.post('/chat', async (req, res) => {
     const { userId, prompt } = req.body;
