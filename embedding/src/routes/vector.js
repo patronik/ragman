@@ -18,8 +18,10 @@ router.post('/create',
     const { name, text, category } = req.body;
     try {
       const embedding = await vectorizeText(text);
+
+      // console.log('embedding:', embedding);
   
-      if (Array.isArray(embedding)) {
+      if (!Array.isArray(embedding)) {
         throw Error('Wrong embedding type. Array required.');
       }
 
