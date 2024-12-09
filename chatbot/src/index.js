@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
-import { getJobDocuments } from './services/jobService';
-import { getChatResponse } from './services/chatService';
-import { saveChatHistory, getChatHistory } from './utils/historyManager';
+import { getJobDocuments } from './services/jobService.js';
+import { getChatResponse } from './services/chatService.js';
+import { saveChatHistory, getChatHistory } from './utils/historyManager.js';
 
 const app = express();
 app.use(express.json());
@@ -31,7 +31,7 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 6000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

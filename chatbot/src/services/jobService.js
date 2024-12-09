@@ -11,6 +11,9 @@ async function getJobDocuments(query) {
             }
         }    
     );
+
+    console.log(response.data);
+
     return response.data;
 }
 
