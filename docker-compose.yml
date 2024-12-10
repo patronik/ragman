@@ -18,11 +18,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "${CHAT_APP_PORT}:${CHAT_APP_PORT}"
-      # - "9229:9229"
+      #- "9229:9229"
     environment:
-      - DATABASE_URL=postgresql://${POSTGRESS_USERNAME}:${POSTGRESS_PASSWORD}@postgresql:5432/${POSTGRESS_DBNAME}
-    volumes:
-      - /var/www/ai/chatbot/src:/app/src
+      - DATABASE_URL=postgresql://${POSTGRESS_USERNAME}:${POSTGRESS_PASSWORD}@postgresql:5432/${POSTGRESS_DBNAME}    
     depends_on:
       - postgresql
   postgresql:
