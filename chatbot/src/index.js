@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
-import { getJobDocuments } from './services/jobService.js';
+import { getDocuments } from './services/documentService.js';
 import { getChatResponse } from './services/chatService.js';
 import { saveChatHistory, getChatHistory } from './utils/historyManager.js';
 import { fileURLToPath } from 'url';
@@ -26,9 +26,9 @@ app.post('/chat', async (req, res) => {
     }
 
     try {
-        const history = getChatHistory(userId);
-        const jobDocuments = await getJobDocuments(prompt);
-        const chatInput = { history, prompt, jobDocuments };
+        const history = await getChatHistory(userId);
+        const documents = await getDocuments(prompt);
+        const chatInput = { history, prompt, documents };
 
         const response = await getChatResponse(chatInput);
 
