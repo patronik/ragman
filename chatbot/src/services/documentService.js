@@ -16,7 +16,7 @@ async function getDocuments(query) {
             }
         }    
     );
-    return response.data.map(i => i.document);
+    return response.data.map(i => {i.title, i.content});
 }
 
 export { getDocuments };

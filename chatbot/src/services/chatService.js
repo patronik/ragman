@@ -6,18 +6,35 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
-async function getChatResponse({ history, prompt, documents }) {
-    const messages = [
+function getChatMessages(history, prompt, documents) {
+     // Combine documents into a single context string
+    const documentContext = documents
+    .map((doc) => `Title: ${doc.title}\nContent: ${doc.content}`)
+    .join("\n\n");
+    
+    return [
         ...history,
-        { role: 'user', content: prompt },
-        { role: 'system', content: `${process.env.COMPLETION_SYSTEM_PROMPT}${JSON.stringify(documents)}` },
+        {
+          role: "system",
+          content: process.env.OPENAI_SYSTEM_MESSAGE,
+        },
+        {
+          role: "user",
+          content: `User Query: ${prompt}`,
+        },
+        {
+          role: "system",
+          content: `Retrieved Documents:\n\n${documentContext}\n\nUse this information to respond to the user's query.`,
+        }
     ];
+}
 
+async function getChatResponse({ history, prompt, documents }) {
+    const messages = getChatMessages(history, prompt, documents);
     const response = await openai.chat.completions.create({
-        model: process.env.COMPLETION_MODEL,
+        model: process.env.OPENAI_COMPLETION_MODEL,
         messages
     });
-
     return response.choices[0].message.content;
 }
 
