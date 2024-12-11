@@ -7,7 +7,7 @@ async function getDocuments(query) {
     const url = `${process.env.EMBEDDING_API_URL}/vector/search`;
     const response = await axios.post(url, {
             prompt: query,
-            context: process.env.DOCUMENT_SEARCH_CONTEXT,
+            category: process.env.DOCUMENT_SEARCH_CATEGORY,
             limit: process.env.DOCUMENT_SEARCH_LIMIT      
         }, 
         {

@@ -3,9 +3,9 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE IF NOT EXISTS vectors (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    context TEXT NOT NULL,
-    embedding VECTOR(1536)
+    content TEXT NOT NULL,    
+    embedding VECTOR(1536),
+    metadata JSONB NOT NULL
 );
 
 CREATE TABLE chat_history (
