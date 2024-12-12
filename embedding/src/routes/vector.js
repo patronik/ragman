@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, validationResult }  from 'express-validator';
-import { pool } from '../db.js';
-import { vectorizeText } from '../utils/vectorizer.js';
+import { insertDocument, searchByTitleAndCategory, searchSimilar } from '../db.js';
+import { normalizeText, vectorizeText } from '../utils/vectorizer.js';
 
 const router = express.Router();
 
@@ -15,13 +15,15 @@ router.post('/create',
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const { title, content, category } = req.body;
-    //TODO store other document metadata
+    const { title, category } = req.body;
+
+    const content = normalizeText(req.body.content);
+    if (content.length > process.env.MAX_DOCUMENT_SIZE) {
+      throw Error(`Document '${title}' is too big. Max size is ${process.env.MAX_DOCUMENT_SIZE} of words.`);  
+    }
+
     try {
-      const result = await pool.query(
-        `SELECT * FROM vectors WHERE title = $1 AND metadata ->> 'category' = $2;`, 
-        [title, category]
-      );
+      const result = await searchByTitleAndCategory(title, category);      
       if (result.rows.length > 0) {
         throw Error(`Document with name ${title} already exists`);
       }
@@ -36,10 +38,7 @@ router.post('/create',
         throw Error('Wrong embedding dimension. 1536 expected.');
       }      
 
-      await pool.query(
-        `INSERT INTO vectors (title, content, embedding, metadata) VALUES ($1, $2, '${JSON.stringify(embedding)}', $3)`,
-        [title, content, JSON.stringify({category})]
-      );
+      await insertDocument(content, embedding, {category, title});   
 
       res.status(201).send({ message: 'Vector saved.' });
     } catch (err) {
@@ -47,8 +46,6 @@ router.post('/create',
       res.status(500).send({ error: 'Error saving vector.' });
     }
 });
-
-// TODO implement batch create
 
 // Search for similar vectors
 router.post('/search', 
@@ -63,15 +60,7 @@ router.post('/search',
     const { prompt, category, limit } = req.body;
     try {
       const queryVector = await vectorizeText(prompt);
-      const result = await pool.query(
-        `
-        SELECT id, title, content, embedding <-> '${JSON.stringify(queryVector)}' AS distance
-        FROM vectors
-        WHERE metadata ->> 'category' = $1
-        ORDER BY distance ASC
-        LIMIT $2;
-      `, [category, limit]        
-      );
+      const result = await searchSimilar(queryVector, category, limit);      
       res.status(200).send(result.rows);
     } catch (err) {
       console.log(err);

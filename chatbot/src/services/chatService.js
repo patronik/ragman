@@ -9,7 +9,7 @@ const openai = new OpenAI({
 function getChatMessages(history, prompt, documents) {
      // Combine documents into a single context string
     const documentContext = documents
-    .map((doc) => `Title: ${doc.title}\nContent: ${doc.content}`)
+    .map((doc) => `Title: ${doc.metadata.title}\nContent: ${doc.content}`)
     .join("\n\n");
     
     return [
