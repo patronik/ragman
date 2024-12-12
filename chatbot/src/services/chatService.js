@@ -6,10 +6,20 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
+function capitalizeFirstLetter(val) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
 function getChatMessages(history, prompt, documents) {
      // Combine documents into a single context string
     const documentContext = documents
-    .map((doc) => `Title: ${doc.metadata.title}\nContent: ${doc.content}`)
+    .map((doc) => {
+      let metadata = [];
+      for (let key in doc.metadata) {
+        metadata.push(`${capitalizeFirstLetter(key)}: ${doc.metadata[key]}`);
+      }
+      return metadata.join("\n") + `\nContent: ${doc.content}`;
+    })
     .join("\n\n");
     
     return [

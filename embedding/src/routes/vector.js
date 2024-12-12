@@ -15,14 +15,14 @@ router.post('/create',
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const { title, category } = req.body;
-
-    const content = normalizeText(req.body.content);
-    if (content.length > process.env.MAX_DOCUMENT_SIZE) {
-      throw Error(`Document '${title}' is too big. Max size is ${process.env.MAX_DOCUMENT_SIZE} of words.`);  
-    }
+    const { title, category, metadata } = req.body;
 
     try {
+      const content = normalizeText(req.body.content);
+      if (content.length > process.env.MAX_DOCUMENT_SIZE) {
+        throw Error(`Document '${title}' is too big. Max size is ${process.env.MAX_DOCUMENT_SIZE} of words.`);  
+      }
+      
       const result = await searchByTitleAndCategory(title, category);      
       if (result.rows.length > 0) {
         throw Error(`Document with name ${title} already exists`);
@@ -38,7 +38,7 @@ router.post('/create',
         throw Error('Wrong embedding dimension. 1536 expected.');
       }      
 
-      await insertDocument(content, embedding, {category, title});   
+      await insertDocument(content, embedding, {...{category, title}, ...metadata || {}});   
 
       res.status(201).send({ message: 'Vector saved.' });
     } catch (err) {
