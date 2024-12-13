@@ -39,12 +39,36 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "False" 
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"    
+    entrypoint: /bin/sh -c "chmod 600 /pgpass; /entrypoint.sh;"
+    user: root
+    configs:
+      - source: servers.json
+        target: /pgadmin4/servers.json
+      - source: pgpass
+        target: /pgpass
     ports:
       - "8080:80"
     depends_on:
       - postgresql
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+configs:
+  pgpass:
+    content: postgresql:5432:*:${POSTGRESS_USERNAME}:${POSTGRESS_PASSWORD}
+  servers.json:
+    content: |
+      {"Servers": {"1": {
+        "Group": "Servers",
+        "Name": "AI Chatbot DB",
+        "Host": "postgresql",
+        "Port": 5432,
+        "MaintenanceDB": "postgres",
+        "Username": "${POSTGRESS_USERNAME}",
+        "PassFile": "/pgpass",
+        "SSLMode": "prefer"
+      }}}
 volumes:
   postgresql_data:
   pgadmin_data:

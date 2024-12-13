@@ -1,0 +1,10 @@
+{"Servers": {"1": {
+    "Group": "Servers",
+    "Name": "AI Chatbot DB",
+    "Host": "postgresql",
+    "Port": 5432,
+    "MaintenanceDB": "postgres",
+    "Username": "chatbot",
+    "PassFile": "/var/lib/pgadmin/servers.pass",
+    "SSLMode": "prefer"
+  }}}
