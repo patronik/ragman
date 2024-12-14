@@ -1,7 +1,8 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE IF NOT EXISTS vectors (
-    id SERIAL PRIMARY KEY,    
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     content TEXT NOT NULL,    
     embedding VECTOR(1536),
     metadata JSONB NOT NULL

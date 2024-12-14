@@ -1,44 +1,41 @@
 import express from 'express';
 import { body, validationResult }  from 'express-validator';
 import { insertDocument, searchByTitleAndCategory, searchSimilar } from '../db.js';
-import { normalizeText, vectorizeText } from '../utils/vectorizer.js';
+import { splitIntoParagraphChunks, vectorizeText } from '../utils/vectorizer.js';
 
 const router = express.Router();
 
 // Create a vector entry
 router.post('/create',
-  body('title').notEmpty().withMessage('Title parameter is required'),
-  body('category').notEmpty().withMessage('Category parameter is required'),
-  body('content').notEmpty().withMessage('Content parameter is required'),  
+  body('title').notEmpty().withMessage('Title parameter is required.'),
+  body('category').notEmpty().withMessage('Category parameter is required.'),
+  body('content').notEmpty().withMessage('Content parameter is required.'),  
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const { title, category, metadata } = req.body;
+    const { title, category, content, metadata } = req.body;
 
-    try {
-      const content = normalizeText(req.body.content);
-      if (content.length > process.env.MAX_DOCUMENT_SIZE) {
-        throw Error(`Document '${title}' is too big. Max size is ${process.env.MAX_DOCUMENT_SIZE} of words.`);  
-      }
-      
+    try {      
       const result = await searchByTitleAndCategory(title, category);      
       if (result.rows.length > 0) {
-        throw Error(`Document with name ${title} already exists`);
+        throw Error(`Document with name "${title}" and category "${category}" already exists.`);
+      }
+      
+      const chunks = splitIntoParagraphChunks(
+        content, 
+        process.env.CHUNK_SENTENCE_OVERLAP, 
+        {...{category, title}, ...metadata || {}}
+      );
+
+      if (!(chunks.length > 0)) {
+        throw Error(`Document chunking failed. Check your data and try again.`);  
       }
 
-      const embedding = await vectorizeText(content);
-  
-      if (!Array.isArray(embedding)) {
-        throw Error('Wrong embedding type. Array required.');
-      }
-
-      if (embedding.length != 1536) {
-        throw Error('Wrong embedding dimension. 1536 expected.');
+      for (let chunk of chunks) {
+        await createEmbedding(chunk.content, chunk.metadata);        
       }      
-
-      await insertDocument(content, embedding, {...{category, title}, ...metadata || {}});   
 
       res.status(201).send({ message: 'Vector saved.' });
     } catch (err) {
@@ -49,9 +46,9 @@ router.post('/create',
 
 // Search for similar vectors
 router.post('/search', 
-  body('prompt').notEmpty().withMessage('Prompt parameter is required'),
-  body('category').notEmpty().withMessage('Category parameter is required'),
-  body('limit').notEmpty().withMessage('Limit parameter is required'),
+  body('prompt').notEmpty().withMessage('Prompt parameter is required.'),
+  body('category').notEmpty().withMessage('Category parameter is required.'),
+  body('limit').notEmpty().withMessage('Limit parameter is required.'),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -67,5 +64,21 @@ router.post('/search',
       res.status(500).send({ error: 'Error searching vectors.' });
     }
 });
+
+
+async function createEmbedding(content, metadata) {
+  const embedding = await vectorizeText(content);
+  
+  if (!Array.isArray(embedding)) {
+    throw Error('Wrong embedding type. Array required.');
+  }
+
+  if (embedding.length != process.env.EMBEDDING_DIMENSION) {
+    throw Error(`Wrong embedding dimension. ${process.env.EMBEDDING_DIMENSION} expected.`);
+  }     
+    
+  await insertDocument(content, embedding, metadata);   
+}
+
 
 export default router;
