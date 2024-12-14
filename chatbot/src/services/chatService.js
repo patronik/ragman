@@ -25,7 +25,7 @@ function getChatMessages(history, prompt, documents) {
     })
     .join("\n\n");
     
-    return [
+    let messages = [
         ...history,
         {
           role: "system",
@@ -34,12 +34,19 @@ function getChatMessages(history, prompt, documents) {
         {
           role: "user",
           content: `User Query: ${prompt}`,
-        },
+        }        
+    ];
+
+    if (documentContext.length > 0) {
+      messages.push(
         {
           role: "system",
           content: `Retrieved Documents:\n\n${documentContext}\n\nUse this information to respond to the user's query.`,
-        }
-    ];
+        }  
+      );  
+    }
+
+    return messages;
 }
 
 async function getChatResponse({ history, prompt, documents }) {
