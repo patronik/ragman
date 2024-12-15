@@ -9,7 +9,8 @@
       "pg": "^8.8.0",
       "pgvector": "^0.1.0",
       "axios": "^1.0.0",
-      "express-validator": "^7.2.0"      
+      "express-validator": "^7.2.0",
+      "xregexp": "^5.1.1"      
     },
     "scripts": {
       "start": "node src/app.js"
