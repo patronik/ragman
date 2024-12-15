@@ -19,15 +19,15 @@ app.get('/chat', async (req, res) => {
 });
 
 app.post('/chat', async (req, res) => {
-    const { userId, prompt } = req.body;
+    const { userId, prompt, category } = req.body;
 
-    if (!userId || !prompt) {
+    if (!userId || !prompt || !category) {
         return res.status(400).send({ error: 'Missing userId or prompt.' });
     }
 
     try {
         const history = await getChatHistory(userId);
-        const documents = await getDocuments(prompt);
+        const documents = await getDocuments(prompt, category);
         const chatInput = { history, prompt, documents };
 
         const response = await getChatResponse(chatInput);

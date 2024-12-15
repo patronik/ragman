@@ -2,6 +2,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 import axios from 'axios';
 
+function normalizeText(text) {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
 export const splitIntoParagraphChunks = (text, overlapSentences, metadata) => {
   const paragraphs = text.split(/\n+/).filter(p => p.trim() !== '');
   let chunks = [];
@@ -19,7 +23,7 @@ export const splitIntoParagraphChunks = (text, overlapSentences, metadata) => {
   }
 
   return chunks.map((chunk, index) => ({
-    content: chunk,
+    content: normalizeText(chunk),
     metadata: {
         ...metadata,
         "Chunk number": index + 1,
