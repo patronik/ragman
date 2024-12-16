@@ -1,7 +1,9 @@
 import express from 'express';
 import { body, validationResult }  from 'express-validator';
-import { insertDocument, searchByTitleAndCategory, searchSimilar } from '../db.js';
-import { splitIntoParagraphChunks, vectorizeText } from '../utils/vectorizer.js';
+import { insertDocument, searchByMetadata, searchSimilar } from '../db.js';
+import { splitIntoParagraphChunks } from '../utils/text.js';
+import { vectorizeText } from '../utils/vector.js';
+
 
 const router = express.Router();
 
@@ -18,7 +20,7 @@ router.post('/create',
     const { title, category, content, metadata } = req.body;
 
     try {      
-      const result = await searchByTitleAndCategory(title, category);      
+      const result = await searchByMetadata({title, category});      
       if (result.rows.length > 0) {
         throw Error(`Document with name "${title}" and category "${category}" already exists.`);
       }
@@ -26,7 +28,14 @@ router.post('/create',
       const chunks = splitIntoParagraphChunks(
         content, 
         process.env.CHUNK_SENTENCE_OVERLAP, 
-        {...{category, title}, ...metadata || {}}
+        {
+          ...{
+            category, 
+            title, 
+            createdAt : new Date().toISOString()
+          }, 
+          ...metadata || {}
+        }
       );
 
       if (!(chunks.length > 0)) {

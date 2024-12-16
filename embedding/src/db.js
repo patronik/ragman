@@ -16,17 +16,27 @@ export const insertDocument = async (content, embedding, metadata) =>
   );
 };
 
-export const searchByTitleAndCategory = async (title, category) =>
+export const searchByMetadata = async (metadata) =>
 {
-    const result = await pool.query(
-      `
-        SELECT * FROM vectors 
-        WHERE metadata ->> 'title' = $1 
-        AND metadata ->> 'category' = $2;
-      `, 
-      [title, category]
-    );    
-    return result;
+  if (Object.keys(metadata).length === 0) {
+    throw new Error('Metadata object has no properties.');     
+  }
+
+  let argIndex = 1;
+  let whereSql = [];
+  let whereArgs = [];
+  for (let key in metadata) {
+    whereSql.push(
+      `metadata ->> '${key}' = $${argIndex}`
+    );
+    whereArgs.push(metadata[key]);
+    argIndex++;
+  }
+
+  const result = await pool.query(
+    `SELECT * FROM vectors WHERE ${whereSql.join(' AND ')};`, whereArgs
+  );    
+  return result;
 };
   
 
