@@ -3,11 +3,17 @@ dotenv.config();
 import axios from 'axios';
 import XRegExp  from 'xregexp';
 
-// Define the regex for cleaning
-const regex = XRegExp("[^\\p{L}\\p{N}\\s.,!?-]+|(?<!\\d)[.,!?-]{2,}(?!\\d)|\\s{2,}", "gu");
-
 function normalizeText(text) {
-  return text.replace(regex, " ").trim();
+  return text.replace(
+      XRegExp("[^\\p{L}\\p{N}\\s.,!?:;-]+", "gu"),
+       " "
+    ).replace(
+      XRegExp("(?<!\\d)[.,!?:;-]{2,}(?!\\d)", "gu"),
+      " "
+    ).replace(
+      XRegExp("\\s{2,}", "gu"),
+      " "
+    ).trim();
 }
 
 export const splitIntoParagraphChunks = (text, overlapSentences, metadata) => {
