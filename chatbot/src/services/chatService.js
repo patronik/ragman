@@ -1,6 +1,14 @@
 import dotenv from 'dotenv';
 dotenv.config();
+import { sprintf } from 'sprintf-js';
 import { OpenAI }  from 'openai';
+
+if (!process.env.OPENAI_SYSTEM_MESSAGE
+    || !process.env.OPENAI_PROMPT_MESSAGE
+    || !process.env.OPENAI_DOCUMENT_MESSAGE
+) {
+throw new Error('OpenAI configuration is missing.');  
+}
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
@@ -10,9 +18,9 @@ function ucFirst(str) {
   return String(str).charAt(0).toUpperCase() + String(str).slice(1);
 }
 
-function getChatMessages(history, prompt, documents) {
-     // Combine documents into a single context string
-    const documentContext = documents
+function prepareDocuments(documents)
+{
+  return documents
     .map((document) => {
       let metadata = [];
       if (document.id != undefined) {
@@ -24,16 +32,19 @@ function getChatMessages(history, prompt, documents) {
       return metadata.join("\n") + `\nContent: ${document.content}`;
     })
     .join("\n\n");
-    
+}
+
+function getChatMessages(history, prompt, documents) {        
+    const documentContext = prepareDocuments(documents);    
     let messages = [
         ...history,
         {
           role: "system",
-          content: process.env.OPENAI_SYSTEM_MESSAGE,
+          content: sprintf(process.env.OPENAI_SYSTEM_MESSAGE),
         },
         {
           role: "user",
-          content: `User Query: ${prompt}`,
+          content: sprintf(process.env.OPENAI_PROMPT_MESSAGE, prompt),
         }        
     ];
 
@@ -41,7 +52,7 @@ function getChatMessages(history, prompt, documents) {
       messages.push(
         {
           role: "system",
-          content: `Retrieved Documents:\n\n${documentContext}\n\nUse this information to respond to the user's query.`,
+          content: sprintf(process.env.OPENAI_DOCUMENT_MESSAGE, documentContext),
         }  
       );  
     }
