@@ -6,7 +6,7 @@ openai:
   completion_model: "gpt-4"
 chat:
   messages:
-    sandbox:
+    test:
       system: |
         You are a professional assistant designed to help users find answers to their general questions. 
         Your primary task is to combine retrieved information from the document database with your knowledge 

@@ -12,11 +12,11 @@ services:
   chatbot-app:
     build: 
       context: ./chatbot
-      #dockerfile: DockerfileDebug
-      dockerfile: Dockerfile
+      dockerfile: DockerfileDebug
+      #dockerfile: Dockerfile
     ports:
       - "${CHAT_APP_PORT}:${CHAT_APP_PORT}"
-      #- "9229:9229"    
+      - "9229:9229"    
     depends_on:
       - postgresql
   postgresql:
