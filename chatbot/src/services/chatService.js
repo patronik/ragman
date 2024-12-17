@@ -1,17 +1,15 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import config from '../config.js';
 import { sprintf } from 'sprintf-js';
 import { OpenAI }  from 'openai';
 
-if (!process.env.OPENAI_SYSTEM_MESSAGE
-    || !process.env.OPENAI_PROMPT_MESSAGE
-    || !process.env.OPENAI_DOCUMENT_MESSAGE
+if (!config.openai.api_key
+    || !config.openai.completion_model  
 ) {
-throw new Error('OpenAI configuration is missing.');  
+  throw new Error('OpenAI configuration is missing.');  
 }
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: config.openai.api_key
 });
 
 function ucFirst(str) {
@@ -34,17 +32,25 @@ function prepareDocuments(documents)
     .join("\n\n");
 }
 
-function getChatMessages(history, prompt, documents) {        
+function getChatMessages(history, prompt, documents, category) {        
     const documentContext = prepareDocuments(documents);    
+
+    if (!config.chat.messages[category].system
+        || !config.chat.messages[category].prompt
+        || !config.chat.messages[category].document
+    ) {
+      throw new Error('Chat configuration is missing.');  
+    }
+
     let messages = [
         ...history,
         {
           role: "system",
-          content: sprintf(process.env.OPENAI_SYSTEM_MESSAGE),
+          content: sprintf(config.chat.messages[category].system),
         },
         {
           role: "user",
-          content: sprintf(process.env.OPENAI_PROMPT_MESSAGE, prompt),
+          content: sprintf(config.chat.messages[category].prompt, prompt),
         }        
     ];
 
@@ -52,7 +58,7 @@ function getChatMessages(history, prompt, documents) {
       messages.push(
         {
           role: "system",
-          content: sprintf(process.env.OPENAI_DOCUMENT_MESSAGE, documentContext),
+          content: sprintf(config.chat.messages[category].document, documentContext),
         }  
       );  
     }
@@ -60,10 +66,10 @@ function getChatMessages(history, prompt, documents) {
     return messages;
 }
 
-async function getChatResponse({ history, prompt, documents }) {
-    const messages = getChatMessages(history, prompt, documents);
+async function getChatResponse({ history, prompt, documents, category }) {
+    const messages = getChatMessages(history, prompt, documents, category);
     const response = await openai.chat.completions.create({
-        model: process.env.OPENAI_COMPLETION_MODEL,
+        model: config.openai.completion_model,
         messages
     });
     return response.choices[0].message.content;

@@ -4,7 +4,6 @@ import { insertDocument, searchByMetadata, searchSimilar } from '../db.js';
 import { splitIntoParagraphChunks } from '../utils/text.js';
 import { vectorizeText } from '../utils/vector.js';
 
-
 const router = express.Router();
 
 // Create a vector entry

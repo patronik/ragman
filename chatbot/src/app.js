@@ -1,5 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import config from './config.js';
 import express from 'express';
 import { getDocuments } from './services/documentService.js';
 import { getChatResponse } from './services/chatService.js';
@@ -28,7 +27,7 @@ app.post('/chat', async (req, res) => {
     try {
         const history = await getChatHistory(userId);
         const documents = await getDocuments(prompt, category);
-        const chatInput = { history, prompt, documents };
+        const chatInput = { history, prompt, documents, category };
 
         const response = await getChatResponse(chatInput);
 
@@ -41,7 +40,7 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 6000;
+const PORT = config.port || 6000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
