@@ -29,3 +29,9 @@ chat:
         Use this information to respond to the user's query.        
   document:
     limit: 5
+postgres:
+  hostname: "<YOUR DB HOSTNAME>"
+  port: "<YOUR DB PORT>"
+  username: "<YOUR DB USERNAME>"
+  password: "<YOUR DB PASSWORD>"
+  dbname: "<YOUR DB NAME>"

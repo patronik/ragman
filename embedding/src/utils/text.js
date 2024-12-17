@@ -1,8 +1,8 @@
 import XRegExp  from 'xregexp';
 
-function normalizeText(text) {
+const normalizeText = (text) => {
     return text.replace(
-    XRegExp("[^\\p{L}\\p{N}\\s.,!?:;-]+", "gu"),
+    XRegExp("[^\\p{L}\\p{N}\\s.,!?:;-]+", "gu"), 
         " "
     ).replace(
     XRegExp("(?<!\\d)[.,!?:;-]{2,}(?!\\d)", "gu"),

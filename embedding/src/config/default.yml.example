@@ -1,0 +1,12 @@
+port: 5000
+openai:
+  api_key: "<YOUR API KEY>"  
+  embedding_model: "text-embedding-ada-002"
+embedding_dimension: 1536
+chunk_overlap: 1
+postgres:
+  hostname: "<YOUR DB HOSTNAME>"
+  port: "<YOUR DB PORT>"
+  username: "<YOUR DB USERNAME>"
+  password: "<YOUR DB PASSWORD>"
+  dbname: "<YOUR DB NAME>"

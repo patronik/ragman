@@ -1,5 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import config from '../config.js';
 import axios from 'axios';
 
 export const vectorizeText = async (text) => {
@@ -8,11 +7,11 @@ export const vectorizeText = async (text) => {
       'https://api.openai.com/v1/embeddings',
       {
         input: text,
-        model: process.env.EMBEDDING_MODEL || 'text-embedding-ada-002',
+        model: config.openai.embedding_model || 'text-embedding-ada-002',
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${config.openai.api_key}`,
           'Content-Type': 'application/json',
         },
       }

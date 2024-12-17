@@ -1,12 +1,10 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
+import config from './config.js';
 import express from 'express';
 import bodyParser from 'body-parser';
 import vectorRoutes from './routes/vector.js';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = config.port || 5000;
 
 app.use(bodyParser.json());
 app.use('/vector', vectorRoutes);

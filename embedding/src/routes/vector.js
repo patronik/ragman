@@ -1,3 +1,4 @@
+import config from '../config.js';
 import express from 'express';
 import { body, validationResult }  from 'express-validator';
 import { insertDocument, searchByMetadata, searchSimilar } from '../db.js';
@@ -26,7 +27,7 @@ router.post('/create',
       
       const chunks = splitIntoParagraphChunks(
         content, 
-        process.env.CHUNK_SENTENCE_OVERLAP, 
+        config.chunk_overlap || 1, 
         {
           ...{
             category, 
@@ -81,8 +82,8 @@ async function createEmbedding(content, metadata) {
     throw Error('Wrong embedding type. Array required.');
   }
 
-  if (embedding.length != process.env.EMBEDDING_DIMENSION) {
-    throw Error(`Wrong embedding dimension. ${process.env.EMBEDDING_DIMENSION} expected.`);
+  if (embedding.length != config.embedding_dimension) {
+    throw Error(`Wrong embedding dimension. ${config.embedding_dimension} expected.`);
   }     
     
   await insertDocument(content, embedding, metadata);   

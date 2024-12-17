@@ -1,2 +1,3 @@
 .env
 chatbot/src/config/default.yml
+embedding/src/config/default.yml
