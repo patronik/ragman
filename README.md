@@ -1,6 +1,10 @@
 ## Ragman - is an open source AI powered chatbot, that provides the possibility to include your custom documents (RAG) in order to achive context specific question answering. 
 
-![Conversation example](chat-conversation.png)
+### See how the response to the same changed after single document has been indexed to vector database.
+
+<p align="center">
+<img src="https://i.ibb.co/02QP9Dt/demo.png" height="316px" width="526px" alt="Chat demo" />
+</p>
 
 ## Features
 ### Documents
@@ -103,10 +107,10 @@ docker-compose up -d --build
 ### 3. Send your documents to `http://localhost:5000/vector/create` endpoint
 ```bash
 curl -X POST http://localhost:5000/vector/create -H "Content-Type: application/json" -d '{
-    "title": "Oleksandr Yarmak",
-    "content": "Oleksandr Yarmak (Ukrainian: Олександр Валентинович Ярмак, born 24 October 1991) is a Ukrainian singer and rapper. Yarmak performs songs in both Russian and Ukrainian. The themes of his songs range from humor and love to social injustice. Yarmak has also appeared in the serial Yak hartuvavsya Style.",
+    "title": "Ragman",
+    "content": "Ragman - is an open source AI powered chatbot, that provides the possibility to include your custom documents (RAG) in order to achive context specific question answering.",
     "category": "test",
-    "metadata" : {"age": "33", "album count": "6"}
+    "metadata" : {"categories": "Generative AI, AI powered chatbot, RAG chatbot"}
 }'
 ```
 Make sure that document category messages are configured in chatbot app configuration. See example:
