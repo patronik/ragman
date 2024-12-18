@@ -1,6 +1,6 @@
 ## Ragman - is an open source AI powered chatbot, that provides the possibility to include your custom documents (RAG) in order to achive context specific question answering. 
 
-![Conversation example](chat-conversation.png)
+![Conversation example](chat-conversation.jpg)
 
 ## Features
 ### Documents
@@ -109,7 +109,16 @@ curl -X POST http://localhost:5000/vector/create -H "Content-Type: application/j
     "metadata" : {"age": "33", "album count": "6"}
 }'
 ```
-Make sure that document category is configured in chatbot app configuration.
+Make sure that document category messages are configured in chatbot app configuration. See example:
+```yaml
+chat:
+  messages:
+    chat_category: 
+      system: "System message that contains general LLM instructions."
+      prompt: "User Query: %s."
+      document: "Documents: %s."
+
+```
 ### 2. Go to `http://localhost:4000` to start chat conversation
 ## License
 This project is licensed under the MIT License.
