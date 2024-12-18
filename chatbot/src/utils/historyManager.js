@@ -1,6 +1,5 @@
+import config from '../config.js';
 import { pool } from '../db.js';
-
-const EXPIRATION_TIME_HOURS = 24;
 
 // Save chat history to the database
 async function saveChatHistory(userId, prompt, response) {
@@ -47,7 +46,7 @@ async function cleanupExpiredHistory() {
     try {
         await pool.query(
             `DELETE FROM chat_history 
-             WHERE timestamp < NOW() - INTERVAL '${EXPIRATION_TIME_HOURS} HOURS'`
+             WHERE timestamp < NOW() - INTERVAL '${config.chat.history.expiration_hours || 24} HOURS'`
         );
     } catch (err) {
         console.error('Error cleaning up expired chat history:', err);

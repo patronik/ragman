@@ -1,5 +1,6 @@
 import config from './config.js';
 import express from 'express';
+import session from 'express-session';
 import { getDocuments } from './services/documentService.js';
 import { getChatResponse } from './services/chatService.js';
 import { saveChatHistory, getChatHistory } from './utils/historyManager.js';
@@ -10,6 +11,23 @@ const app = express();
 app.use(express.json());
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+if (!config.session.secret) {
+    throw new Error('Session secret is not configured.');
+}
+
+// Session middleware setup
+app.use(
+session({
+        secret: config.session.secret, 
+        resave: config.session.resave 
+            ? config.session.resave == "true" : false,
+        saveUninitialized: config.session.saveUninitialized 
+            ? config.session.saveUninitialized == "true" : true,
+        cookie: { maxAge: config.session.maxAge || 600000 } 
+    })
+);
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -18,14 +36,28 @@ app.get('/chat', async (req, res) => {
 });
 
 app.post('/chat', async (req, res) => {
-    const { userId, prompt, category } = req.body;
+    const { prompt } = req.body;
 
-    if (!userId || !prompt || !category) {
-        return res.status(400).send({ error: 'Missing userId or prompt.' });
+    if (!prompt) {
+        return res.status(400).send({ error: 'Missing prompt.' });
     }
 
+    let userId = req.body.userId;
+    if (!userId) {
+        if (req.session.id) {
+            userId = req.session.id;
+        } else {
+            throw new Error('Failed to identify the user.');
+        }
+    }
+
+    if (!config.chat.category) {
+        throw new Error('Chat category is not configured.');
+    }   
+    const category = config.chat.category;
+
     try {
-        const history = await getChatHistory(userId);
+        const history = await getChatHistory(`${userId}_${category}`);
         const documents = await getDocuments(prompt, category);
         const chatInput = { history, prompt, documents, category };
 
@@ -40,7 +72,7 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-const PORT = config.port || 6000;
+const PORT = config.port || 4000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
