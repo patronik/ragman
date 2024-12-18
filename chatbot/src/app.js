@@ -16,6 +16,10 @@ if (!config.session.secret) {
     throw new Error('Session secret is not configured.');
 }
 
+if (!config.base_url) {
+    throw new Error('Base URL is not configured.');
+}
+
 // Session middleware setup
 app.use(
 session({
@@ -32,7 +36,12 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/chat', async (req, res) => {
-    res.render('chat');
+    res.render(
+        'chat', 
+        {
+            baseUrl: config.base_url
+        }
+    );
 });
 
 app.post('/chat', async (req, res) => {

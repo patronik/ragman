@@ -1,4 +1,5 @@
 port: 4000
+base_url: "http://localhost:4000"
 embedding:
   api_url: "http://embedding-app:5000"
 openai:
