@@ -45,11 +45,15 @@ app.get('/chat', async (req, res) => {
 });
 
 app.post('/chat', async (req, res) => {
-    const { prompt } = req.body;
+    const { prompt, category } = req.body;
 
     if (!prompt) {
         return res.status(400).send({ error: 'Missing prompt.' });
     }
+
+    if (!category) {
+        throw new Error('Chat category is not provided.');
+    }   
 
     let userId = req.body.userId;
     if (!userId) {
@@ -58,12 +62,7 @@ app.post('/chat', async (req, res) => {
         } else {
             throw new Error('Failed to identify the user.');
         }
-    }
-
-    if (!config.chat.category) {
-        throw new Error('Chat category is not configured.');
     }   
-    const category = config.chat.category;
 
     try {
         const history = await getChatHistory(`${userId}_${category}`);

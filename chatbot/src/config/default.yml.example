@@ -6,7 +6,6 @@ openai:
   api_key: "<YOUR OPENAI API KEY>"
   completion_model: "gpt-4"
 chat:
-  category: "test"
   messages:
     test:
       system: |
@@ -32,7 +31,7 @@ session:
   secret: "session secret"
   resave: "false"
   saveUninitialized: "true"
-  maxAge: 600000
+  maxAge: 604800000
 postgres:
   hostname: "<YOUR DB HOSTNAME>"
   port: "<YOUR DB PORT>"
