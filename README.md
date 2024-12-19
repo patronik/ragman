@@ -6,6 +6,26 @@
 <img src="https://voinatech.com/images/ragman.png" height="410px" width="700px" alt="Chat demo" />
 </p>
 
+## Tech Stack
+
+### This project utilizes a robust and modern tech stack to deliver high performance, scalability, and seamless integration of advanced AI capabilities. Below is an overview of the core technologies and tools employed:
+
+### Backend Technologies
+
+- Node.js: A powerful, event-driven JavaScript runtime, ensuring efficient and scalable server-side execution.
+
+- Express.js: A lightweight and flexible web application framework for Node.js, enabling robust API development and middleware support.
+
+### Database
+
+- PostgreSQL: A highly reliable and advanced relational database system used for managing and storing project data.
+
+- pgvector Extension: Extends PostgreSQL with vector similarity search capabilities, allowing for efficient handling of AI-powered features such as embedding comparisons.
+
+### AI Integration
+
+- OpenAI API: Integrated to leverage state-of-the-art language models for tasks such as text generation, summarization, and other AI-driven functionalities.
+
 ## Features
 ### Documents
 - Document indexing: Documents are sent to specific endpoint where the are chunked into semantic pieces, normalized, and saved to postgresql database as vector data.
@@ -103,7 +123,7 @@ postgres:
 ```
 docker-compose up --build
 ```
-or this to run in background
+or to run in background
 ```
 docker-compose up -d --build
 ```
@@ -120,7 +140,7 @@ Make sure that document category messages are configured in chatbot app configur
 ```yaml
 chat:
   messages:
-    chat_category: 
+    category: 
       system: "System message that contains general LLM instructions."
       prompt: "User Query: %s."
       document: "Documents: %s."
