@@ -101,14 +101,16 @@ chat:
         - Please determinte the language of user prompt and respond in that language.
         Always focus on providing practical, actionable, and contextually appropriate advice to support the user's job search goals.
       prompt: "User Query: %s"
-      document: | 
-        Retrieved Documents:
-        
-        %s
-        
-        Use this information to respond to the user's query.        
+      document: "Retrieved Documents:\n\n%s\n\nUse this information to respond to the user's query."        
   document:
     limit: 5
+  history:
+    expiration_hours: 24
+session:
+  secret: "<YOUR HISTORY SECRET>"
+  resave: "false"
+  saveUninitialized: "true"
+  maxAge: <YOUR SESSION MAX AGE IN MILLISECONDS>
 postgres:
   hostname: "<YOUR POSTGRESQL DB HOSTNAME>"
   port: "<YOUR POSTGRESQL DB PORT>"
