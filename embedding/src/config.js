@@ -10,4 +10,5 @@ if (!fs.existsSync(__dirname + '/config/default.yml')) {
 }
 
 const config = configYaml(__dirname + '/config/default.yml');
+
 export default config;

@@ -1,4 +1,5 @@
 import config from '../config.js';
+import authMiddleware from '../auth.js';
 import express from 'express';
 import { body, validationResult }  from 'express-validator';
 import { insertDocument, searchByMetadata, searchSimilar } from '../db.js';
@@ -9,6 +10,7 @@ const router = express.Router();
 
 // Create a vector entry
 router.post('/create',
+  authMiddleware,
   body('title').notEmpty().withMessage('Title parameter is required.'),
   body('category').notEmpty().withMessage('Category parameter is required.'),
   body('content').notEmpty().withMessage('Content parameter is required.'),  

@@ -1,4 +1,4 @@
-## Ragman - is an open source AI powered chatbot, that provides the possibility to include your custom documents (RAG) in order to achive context specific question answering. 
+## Ragman - is an open source AI powered chatbot, that provides the possibility to include your custom documents (RAG) in order to achive context specific question answering.
 
 ### See how the response to the same question changed after single document has been indexed to vector database.
 
@@ -34,20 +34,23 @@ cd ragman
 ### 3. Configure the Environment
 Add top level configuration to root `.env` file
 ```
-EMBEDDING_APP_PORT=<YOUR EMBEDDING_APP_PORT>
-CHAT_APP_PORT=<YOUR CHAT_APP_PORT>
+EMBEDDING_APP_PORT=<YOUR EMBEDDING APP PORT NUMBER>
+CHATBOT_APP_PORT=<YOUR CHATBOT APP PORT NUMBER>
 POSTGRESS_USERNAME=<YOUR POSTGRESS_USERNAME>
 POSTGRESS_PASSWORD=<YOUR POSTGRESS_PASSWORD>
 POSTGRESS_DBNAME=<YOUR POSTGRESS_DBNAME>
 ```
 Configure `./embedding/src/config/default.yml` according to template.
 ```yml
-port: 5000
+port: <YOUR EMBEDDING APP PORT NUMBER>
 openai:
   api_key: "<YOUR API KEY>"  
   embedding_model: "text-embedding-ada-002"
 embedding_dimension: 1536
-chunk_overlap: 1
+chunk_overlap: <SIZE OF CHUNK OVERLAP IN NUMBER OF SENTENCES>
+http_auth:
+  username: '<YOUR HTTP AUTH USERNAME>'
+  password: '<YOUR HTTP AUTH PASSWORD>'
 postgres:
   hostname: "<YOUR POSTGRESQL DB HOSTNAME>"
   port: "<YOUR POSTGRESQL DB PORT>"
@@ -57,9 +60,9 @@ postgres:
 ```
 Configure `./chatbot/src/config/default.yml` according to template.
 ```yml
-port: 4000
+port: <YOUR CHATBOT APP PORT NUMBER>
 embedding:
-  api_url: "http://embedding-app:5000"
+  api_url: "http://embedding-app:<EMBEDDING APP PORT NUMBER>"
 openai:
   api_key: "<YOUR OPENAI API KEY>"
   completion_model: "gpt-4"
@@ -104,9 +107,9 @@ or this to run in background
 ```
 docker-compose up -d --build
 ```
-### 3. Send your documents to `http://localhost:5000/vector/create` endpoint
+### 3. Send your documents to `http://localhost:<YOUR EMBEDDING APP PORT NUMBER>/vector/create` endpoint
 ```bash
-curl -X POST http://localhost:5000/vector/create -H "Content-Type: application/json" -d '{
+curl -X POST http://localhost:<YOUR EMBEDDING APP PORT NUMBER>/vector/create -H "Content-Type: application/json" -d '{
     "title": "Ragman",
     "content": "Ragman - is an open source AI powered chatbot, that provides the possibility to include your custom documents (RAG) in order to achive context specific question answering.",
     "category": "test",
@@ -123,6 +126,6 @@ chat:
       document: "Documents: %s."
 
 ```
-### 2. Go to `http://localhost:4000/chat` to start chat conversation
+### 2. Go to `http://localhost:<YOUR CHATBOT APP PORT NUMBER>/chat` to start chat conversation
 ## License
 This project is licensed under the MIT License.

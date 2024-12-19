@@ -4,6 +4,9 @@ openai:
   embedding_model: "text-embedding-ada-002"
 embedding_dimension: 1536
 chunk_overlap: 1
+http_auth:
+  username: 'admin'
+  password: 'pass123'
 postgres:
   hostname: "<YOUR DB HOSTNAME>"
   port: "<YOUR DB PORT>"
