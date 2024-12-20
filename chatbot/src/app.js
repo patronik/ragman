@@ -39,6 +39,7 @@ app.get('/chat', async (req, res) => {
     res.render(
         'chat', 
         {
+            chatbotName: 'Ragman | Demo',
             baseUrl: config.base_url
         }
     );
