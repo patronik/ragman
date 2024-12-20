@@ -218,7 +218,7 @@
 
                     if (response.ok) {
                         const data = await response.json();
-                        addMessage('bot', data.reply || 'No response');
+                        addMessage('bot', data.response || 'No response');
                     } else {
                         addMessage('bot', 'Error: Unable to reach the server');
                     }
