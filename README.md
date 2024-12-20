@@ -136,11 +136,11 @@ curl -X POST http://localhost:<YOUR EMBEDDING APP PORT NUMBER>/vector/create -H 
     "metadata" : {"categories": "Generative AI, AI powered chatbot, RAG chatbot"}
 }'
 ```
-Make sure that document category messages are configured in chatbot app configuration. See example:
+Make sure that conversation scenario messages are configured in chatbot app configuration. See example:
 ```yaml
 chat:
   messages:
-    category: 
+    scenario: 
       system: "System message that contains general LLM instructions."
       prompt: "User Query: %s."
       document: "Documents: %s."
