@@ -45,14 +45,14 @@ app.get('/chat', async (req, res) => {
 });
 
 app.post('/chat', async (req, res) => {
-    const { prompt, category } = req.body;
+    const { prompt, scenario, rag } = req.body;
 
     if (!prompt) {
         return res.status(400).send({ error: 'Missing prompt.' });
     }
 
-    if (!category) {
-        throw new Error('Chat category is not provided.');
+    if (!scenario) {
+        throw new Error('Conversation scenario is not provided.');
     }   
 
     let userId = req.body.userId;
@@ -65,9 +65,14 @@ app.post('/chat', async (req, res) => {
     }   
 
     try {
-        const history = await getChatHistory(`${userId}_${category}`);
-        const documents = await getDocuments(prompt, category);
-        const chatInput = { history, prompt, documents, category };
+        const history = await getChatHistory(`${userId}_${scenario}`);
+
+        let documents = [];
+        if (rag.enabled) {
+            documents = await getDocuments(prompt, rag.category);
+        }
+
+        const chatInput = { history, prompt, documents, scenario };
 
         const response = await getChatResponse(chatInput);
 

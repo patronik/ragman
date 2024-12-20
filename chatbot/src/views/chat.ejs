@@ -1,163 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ragman | Chatbot</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #f4f4f9;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e2f;
+            color: #b0b0b0;
+        }
+        .chatbot-container {
+            max-width: 900px;
+            margin: 75px auto;
+            background: #28293d;
+            box-shadow: 0 6px 9px rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .chatbot-header {
+            background-color: #333344;
+            color: white;
+            text-align: center;
+            padding: 22.5px;
+            font-size: 27px;
+            font-weight: bold;
+        }
+        .chat-thread {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 30px;
+            background-color: #1e1e2f;
+        }
+        .message {
+            margin-bottom: 22.5px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message.user .text {
+            background-color: #444455;
+            align-self: flex-end;
+            color: white;
+        }
+        .message.bot .text {
+            background-color: #333344;
+            color: #b0b0b0;
+        }
+        .text {
+            padding: 15px 22.5px;
+            border-radius: 22.5px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .input-container {
+            display: flex;
+            padding: 15px;
+            background-color: #28293d;
+            border-top: 1px solid #444455;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 15px;
+            border: 1.5px solid #444455;
+            border-radius: 7.5px;
+            font-size: 24px;
+            background-color: #1e1e2f;
+            color: white;
+        }
+        .input-container button {
+            margin-left: 15px;
+            padding: 15px 22.5px;
+            background-color: #56567d;
+            color: white;
+            border: none;
+            border-radius: 7.5px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .input-container button:hover {
+            background-color: #454566;
+        }
+        .controls {
+            padding: 15px;
+            background-color: #28293d;
+            border-top: 1px solid #444455;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .controls select, .controls label {
+            font-size: 24px;
+            color: #b0b0b0;
+        }
+        #knowledge-category {
+            display: none;
+            margin-left: 15px;
+        }
 
-    #chat-container {
-      max-width: 600px;
-      width: 100%;
-      margin: 20px auto;
-      background: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .chatbot-container {
+                max-width: 95%;
+                margin: 50px auto;
+            }
+            .chatbot-header {
+                font-size: 22px;
+                padding: 15px;
+            }
+            .chat-thread {
+                max-height: 400px;
+                padding: 20px;
+            }
+            .text {
+                padding: 10px 15px;
+                font-size: 16px;
+            }
+            .input-container input {
+                font-size: 18px;
+                padding: 10px;
+            }
+            .input-container button {
+                font-size: 18px;
+                padding: 10px 15px;
+            }
+            .controls select, .controls label {
+                font-size: 18px;
+            }
+        }
 
-    #chat-messages {
-      height: 400px;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .message {
-      padding: 10px 15px;
-      border-radius: 20px;
-      max-width: 80%;
-      word-wrap: break-word;
-    }
-
-    .user {
-      align-self: flex-end;
-      background-color: #007bff;
-      color: #fff;
-    }
-
-    .bot {
-      align-self: flex-start;
-      background-color: #e9ecef;
-      color: #333;
-    }
-
-    #input-container {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ddd;
-      background: #f9f9f9;
-    }
-
-    #user-input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      outline: none;
-    }
-
-    #send-button {
-      padding: 10px 20px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 4px;
-      margin-left: 10px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    #send-button:hover {
-      background-color: #0056b3;
-    }
-
-    #send-button:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
-    }
-  </style>
+        @media (max-width: 480px) {
+            .chatbot-header {
+                font-size: 18px;
+            }
+            .chat-thread {
+                max-height: 300px;
+            }
+            .text {
+                font-size: 14px;
+            }
+            .input-container input {
+                font-size: 16px;
+            }
+            .input-container button {
+                font-size: 16px;
+            }
+            .controls select, .controls label {
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="chat-messages"></div>
-    <div id="input-container">
-      <input type="text" id="user-input" placeholder="Type your message..." />
-      <button id="send-button">Send</button>
+    <div class="chatbot-container">
+        <div class="chatbot-header">Chatbot Name</div>
+        <div class="chat-thread" id="chat-thread">
+            <!-- Messages will be dynamically added here -->
+        </div>
+        <div class="controls">
+            <label>
+                <input type="checkbox" id="knowledge-base"> Use Knowledge Base
+            </label>
+            <select id="knowledge-category">
+                <option value="general">General</option>
+                <option value="technical">Technical</option>
+                <option value="finance">Finance</option>
+            </select>
+            <select id="conversation-scenario">
+                <option value="default">Default Scenario</option>
+                <option value="scenario1">Scenario 1</option>
+                <option value="scenario2">Scenario 2</option>
+            </select>
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button id="send-button">Send</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const chatMessages = document.getElementById("chat-messages");
-    const userInput = document.getElementById("user-input");
-    const sendButton = document.getElementById("send-button");
+    <script>
+        const chatThread = document.getElementById('chat-thread');
+        const sendButton = document.getElementById('send-button');
+        const userInput = document.getElementById('user-input');
+        const knowledgeBaseCheckbox = document.getElementById('knowledge-base');
+        const knowledgeCategoryDropdown = document.getElementById('knowledge-category');
+        const conversationScenario = document.getElementById('conversation-scenario');
 
-    const API_URL = "<%= baseUrl %>/chat"; 
-
-    // Function to add a message to the chat
-    function addMessage(content, role) {
-      const message = document.createElement("div");
-      message.classList.add("message", role);
-      message.textContent = content;
-      chatMessages.appendChild(message);
-      chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the bottom
-    }
-
-    // Function to send a message to the backend
-    async function sendMessage() {
-      const prompt = userInput.value.trim();
-      if (!prompt) return;
-
-      // Display the user's message
-      addMessage(prompt, "user");
-      userInput.value = ""; // Clear input
-      sendButton.disabled = true; // Disable send button
-
-      try {
-        // Send request to backend
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({            
-            prompt,
-            category: "test"
-          }),
+        knowledgeBaseCheckbox.addEventListener('change', () => {
+            knowledgeCategoryDropdown.style.display = knowledgeBaseCheckbox.checked ? 'inline-block' : 'none';
         });
 
-        const data = await response.json();
-        if (response.ok && data.response) {
-          // Display the bot's response
-          addMessage(data.response, "bot");
-        } else {
-          addMessage("Error: Unable to get a response.", "bot");
-        }
-      } catch (error) {
-        addMessage("Error: Unable to connect to the server.", "bot");
-      } finally {
-        sendButton.disabled = false; // Re-enable send button
-      }
-    }
+        sendButton.addEventListener('click', async () => {
+            const messageText = userInput.value.trim();
+            if (messageText) {
+                addMessage('user', messageText);
+                userInput.value = '';
 
-    // Event listeners
-    sendButton.addEventListener("click", sendMessage);
-    userInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
-  </script>
+                try {
+                    const response = await fetch('<%= baseUrl %>/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            prompt: messageText,
+                            scenario: conversationScenario.value,
+                            rag: {
+                              enabled: knowledgeBaseCheckbox.checked,
+                              category: knowledgeCategoryDropdown.value,
+                            }
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        addMessage('bot', data.reply || 'No response');
+                    } else {
+                        addMessage('bot', 'Error: Unable to reach the server');
+                    }
+                } catch (error) {
+                    addMessage('bot', 'Error: An unexpected error occurred');
+                }
+            }
+        });
+
+        function addMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text';
+            textDiv.textContent = text;
+            messageDiv.appendChild(textDiv);
+            chatThread.appendChild(messageDiv);
+            chatThread.scrollTop = chatThread.scrollHeight;
+        }
+    </script>
 </body>
 </html>

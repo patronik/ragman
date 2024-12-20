@@ -32,12 +32,12 @@ function prepareDocuments(documents)
     .join("\n\n");
 }
 
-function getChatMessages(history, prompt, documents, category) {        
+function getChatMessages(history, prompt, documents, scenario) {        
     const documentContext = prepareDocuments(documents);    
 
-    if (!config.chat.messages[category].system
-        || !config.chat.messages[category].prompt
-        || !config.chat.messages[category].document
+    if (!config.chat.messages[scenario].system
+        || !config.chat.messages[scenario].prompt
+        || !config.chat.messages[scenario].document
     ) {
       throw new Error('Chat configuration is missing.');  
     }
@@ -46,11 +46,11 @@ function getChatMessages(history, prompt, documents, category) {
         ...history,
         {
           role: "system",
-          content: sprintf(config.chat.messages[category].system),
+          content: sprintf(config.chat.messages[scenario].system),
         },
         {
           role: "user",
-          content: sprintf(config.chat.messages[category].prompt, prompt),
+          content: sprintf(config.chat.messages[scenario].prompt, prompt),
         }        
     ];
 
@@ -58,7 +58,7 @@ function getChatMessages(history, prompt, documents, category) {
       messages.push(
         {
           role: "system",
-          content: sprintf(config.chat.messages[category].document, documentContext),
+          content: sprintf(config.chat.messages[scenario].document, documentContext),
         }  
       );  
     }
@@ -66,8 +66,8 @@ function getChatMessages(history, prompt, documents, category) {
     return messages;
 }
 
-async function getChatResponse({ history, prompt, documents, category }) {
-    const messages = getChatMessages(history, prompt, documents, category);
+async function getChatResponse({ history, prompt, documents, scenario }) {
+    const messages = getChatMessages(history, prompt, documents, scenario);
     const response = await openai.chat.completions.create({
         model: config.openai.completion_model,
         messages
