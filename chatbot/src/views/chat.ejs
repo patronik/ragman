@@ -170,7 +170,7 @@
                 <option value="technical">Technical</option>
                 <option value="finance">Finance</option>
             </select>
-            <select id="conversation-scenario">
+            <select id="chat-scenario">
                 <option value="default">Default Scenario</option>
                 <option value="scenario1">Scenario 1</option>
                 <option value="scenario2">Scenario 2</option>
@@ -186,15 +186,15 @@
         const chatThread = document.getElementById('chat-thread');
         const sendButton = document.getElementById('send-button');
         const userInput = document.getElementById('user-input');
-        const knowledgeBaseCheckbox = document.getElementById('knowledge-base');
-        const knowledgeCategoryDropdown = document.getElementById('knowledge-category');
-        const conversationScenario = document.getElementById('conversation-scenario');
+        const knowledgeBase = document.getElementById('knowledge-base');
+        const knowledgeCategory = document.getElementById('knowledge-category');
+        const chatScenario = document.getElementById('chat-scenario');
 
-        knowledgeBaseCheckbox.addEventListener('change', () => {
-            knowledgeCategoryDropdown.style.display = knowledgeBaseCheckbox.checked ? 'inline-block' : 'none';
+        knowledgeBase.addEventListener('change', () => {
+            knowledgeCategory.style.display = knowledgeBase.checked ? 'inline-block' : 'none';
         });
 
-        sendButton.addEventListener('click', async () => {
+        const sendMessage = async () => {
             const messageText = userInput.value.trim();
             if (messageText) {
                 addMessage('user', messageText);
@@ -208,10 +208,10 @@
                         },
                         body: JSON.stringify({ 
                             prompt: messageText,
-                            scenario: conversationScenario.value,
+                            scenario: chatScenario.value,
                             rag: {
-                              enabled: knowledgeBaseCheckbox.checked,
-                              category: knowledgeCategoryDropdown.value,
+                              enabled: knowledgeBase.checked,
+                              category: knowledgeCategory.value,
                             }
                         })
                     });
@@ -225,6 +225,13 @@
                 } catch (error) {
                     addMessage('bot', 'Error: An unexpected error occurred');
                 }
+            }
+        };
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
             }
         });
 
