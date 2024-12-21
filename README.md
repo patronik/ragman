@@ -85,8 +85,16 @@ openai:
   api_key: "<YOUR OPENAI API KEY>"
   completion_model: "gpt-4"
 chat:
+  name: 'Ragman | Demo'
+  scenarios:
+    - key: "default"
+      label: "Default"
+    - key: "scenario1"
+      label: "Scenario 1"
+    - key: "scenario2"
+      label: "Scenario 2"
   messages:
-    test:
+    default:
       system: |
         You are a professional assistant designed to help users find answers to their general questions. 
         Your primary task is to combine retrieved information from the document database with your knowledge 
@@ -101,9 +109,15 @@ chat:
         - Please determinte the language of user prompt and respond in that language.
         Always focus on providing practical, actionable, and contextually appropriate advice to support the user's job search goals.
       prompt: "User Query: %s"
-      document: "Retrieved Documents:\n\n%s\n\nUse this information to respond to the user's query."        
-  document:
-    limit: 5
+      document: "Retrieved Documents:\n\n%s\n\nUse this information to respond to the user's query."           
+  rag:
+    categories:
+      - key: "general"
+        label: "General"
+      - key: "technical"
+        label: "Technical"
+      - key: "finance"
+        label: "Finance"
   history:
     expiration_hours: 24
 session:

@@ -1,13 +1,9 @@
 import config from '../config.js';
 import axios  from 'axios';
 
-async function getDocuments(query, category) {
+async function getSimilarDocuments(prompt, category, limit) {
     const url = `${config.embedding.api_url}/vector/search`;
-    const response = await axios.post(url, {
-            prompt: query,
-            category: category,
-            limit: config.chat.document.limit  
-        }, 
+    const response = await axios.post(url, {prompt, category, limit }, 
         {
             headers: {
                 'Content-Type': 'application/json'
@@ -17,4 +13,4 @@ async function getDocuments(query, category) {
     return response.data;
 }
 
-export { getDocuments };
+export { getSimilarDocuments };

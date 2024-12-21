@@ -90,18 +90,19 @@
             background-color: #28293d;
             border-top: 1px solid #444455;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-evenly;
             align-items: center;
         }
         .controls select, .controls label {
             font-size: 24px;
             color: #b0b0b0;
         }
-        #knowledge-category {
+        #knowledge-base-options {
             display: none;
-            margin-left: 15px;
         }
-
+        #knowledge-base-options label{
+            padding-left:5px;
+        }
         /* Media Queries */
         @media (max-width: 768px) {
             .chatbot-container {
@@ -162,19 +163,34 @@
             <!-- Messages will be dynamically added here -->
         </div>
         <div class="controls">
+            <label> Chat scenario
+                <select id="chat-scenario">
+                    <% scenarios.forEach((item) => { %>
+                        <option value="<%= item.key %>"><%= item.label %></option>
+                    <% }); %>
+                </select>                      
+            </label>
+        </div>
+        <div class="controls">            
             <label>
                 <input type="checkbox" id="knowledge-base"> Use Knowledge Base
             </label>
-            <select id="knowledge-category">
-                <option value="general">General</option>
-                <option value="technical">Technical</option>
-                <option value="finance">Finance</option>
-            </select>
-            <select id="chat-scenario">
-                <option value="default">Default Scenario</option>
-                <option value="scenario1">Scenario 1</option>
-                <option value="scenario2">Scenario 2</option>
-            </select>
+            <span id="knowledge-base-options">
+                <label> Category
+                    <select id="knowledge-category">
+                        <% categories.forEach((item) => { %>
+                            <option value="<%= item.key %>"><%= item.label %></option>
+                        <% }); %>                    
+                    </select>
+                </label>
+                <label> Document limit
+                    <select id="document-limit">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                    </select>            
+                </label> 
+            </span>            
         </div>
         <div class="input-container">
             <input type="text" id="user-input" placeholder="Type your message here...">
@@ -186,12 +202,16 @@
         const chatThread = document.getElementById('chat-thread');
         const sendButton = document.getElementById('send-button');
         const userInput = document.getElementById('user-input');
-        const knowledgeBase = document.getElementById('knowledge-base');
-        const knowledgeCategory = document.getElementById('knowledge-category');
+
         const chatScenario = document.getElementById('chat-scenario');
 
+        const knowledgeBase = document.getElementById('knowledge-base');
+        const knowledgeCategory = document.getElementById('knowledge-category');
+        const documentLimit = document.getElementById('document-limit');                
+
         knowledgeBase.addEventListener('change', () => {
-            knowledgeCategory.style.display = knowledgeBase.checked ? 'inline-block' : 'none';
+            document.getElementById('knowledge-base-options').style.display 
+            = knowledgeBase.checked ? 'inline-block' : 'none';            
         });
 
         const sendMessage = async () => {
@@ -212,6 +232,7 @@
                             rag: {
                               enabled: knowledgeBase.checked,
                               category: knowledgeCategory.value,
+                              limit: documentLimit.value,
                             }
                         })
                     });

@@ -1,7 +1,7 @@
 import config from './config.js';
 import express from 'express';
 import session from 'express-session';
-import { getDocuments } from './services/documentService.js';
+import { getSimilarDocuments } from './services/documentService.js';
 import { getChatResponse } from './services/chatService.js';
 import { saveChatHistory, getChatHistory } from './utils/historyManager.js';
 import { fileURLToPath } from 'url';
@@ -38,9 +38,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.get('/chat', async (req, res) => {
     res.render(
         'chat', 
-        {
-            chatbotName: 'Ragman | Demo',
-            baseUrl: config.base_url
+        {            
+            baseUrl: config.base_url,
+            chatbotName: config.chat.name || 'Ragman | Demo',
+            scenarios: config.chat.scenarios || [{key: "default", label:"Default"}],
+            categories: config.chat.rag.categories || [{key: "general", label:"General"}],
         }
     );
 });
@@ -70,12 +72,10 @@ app.post('/chat', async (req, res) => {
 
         let documents = [];
         if (rag.enabled) {
-            documents = await getDocuments(prompt, rag.category);
+            documents = await getSimilarDocuments(prompt, rag.category, rag.limit);
         }
 
-        const chatInput = { history, prompt, documents, scenario };
-
-        const response = await getChatResponse(chatInput);
+        const response = await getChatResponse({ history, prompt, documents, scenario });
 
         saveChatHistory(userId, prompt, response);
 
