@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= chatbotName %></title>
     <style>
-        body {
+         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -13,7 +13,7 @@
             color: #b0b0b0;
         }
         .chatbot-container {
-            max-width: 900px;
+            max-width: 1350px; 
             margin: 75px auto;
             background: #28293d;
             box-shadow: 0 6px 9px rgba(0, 0, 0, 0.4);
@@ -25,7 +25,7 @@
             color: white;
             text-align: center;
             padding: 22.5px;
-            font-size: 27px;
+            font-size: 18px;
             font-weight: bold;
         }
         .chat-thread {
@@ -56,6 +56,7 @@
             border-radius: 22.5px;
             max-width: 70%;
             word-wrap: break-word;
+            font-size: 16px;
         }
         .input-container {
             display: flex;
@@ -63,14 +64,16 @@
             background-color: #28293d;
             border-top: 1px solid #444455;
         }
-        .input-container input {
+        .input-container textarea {
             flex: 1;
             padding: 15px;
             border: 1.5px solid #444455;
             border-radius: 7.5px;
-            font-size: 24px;
+            font-size: 16px;
             background-color: #1e1e2f;
             color: white;
+            resize: none;
+            height: 50px;
         }
         .input-container button {
             margin-left: 15px;
@@ -79,7 +82,7 @@
             color: white;
             border: none;
             border-radius: 7.5px;
-            font-size: 24px;
+            font-size: 16px;
             cursor: pointer;
         }
         .input-container button:hover {
@@ -90,18 +93,19 @@
             background-color: #28293d;
             border-top: 1px solid #444455;
             display: flex;
-            justify-content: space-evenly;
+            justify-content: space-between;
             align-items: center;
         }
         .controls select, .controls label {
-            font-size: 24px;
+            font-size: 16px;
             color: #b0b0b0;
         }
         #knowledge-base-options {
             display: none;
         }
-        #knowledge-base-options label{
+        .controls label{
             padding-left:5px;
+            min-height: 22px;
         }
         /* Media Queries */
         @media (max-width: 768px) {
@@ -121,7 +125,7 @@
                 padding: 10px 15px;
                 font-size: 16px;
             }
-            .input-container input {
+            .input-container textarea {
                 font-size: 18px;
                 padding: 10px;
             }
@@ -144,7 +148,7 @@
             .text {
                 font-size: 14px;
             }
-            .input-container input {
+            .input-container textarea {
                 font-size: 16px;
             }
             .input-container button {
@@ -155,6 +159,9 @@
             }
         }
     </style>
+     <!-- Include Highlight.js and Marked.js -->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script> 
 </head>
 <body>
     <div class="chatbot-container">
@@ -193,7 +200,7 @@
             </span>            
         </div>
         <div class="input-container">
-            <input type="text" id="user-input" placeholder="Type your message here...">
+            <textarea id="user-input" placeholder="Type your message here..."></textarea>
             <button id="send-button">Send</button>
         </div>
     </div>
@@ -212,6 +219,13 @@
         knowledgeBase.addEventListener('change', () => {
             document.getElementById('knowledge-base-options').style.display 
             = knowledgeBase.checked ? 'inline-block' : 'none';            
+        });
+        
+        // Configure syntax highliting
+        marked.setOptions({
+            highlight: (code, lang) => {
+                return hljs.highlightAuto(code, lang ? [lang] : undefined).value;
+            }
         });
 
         const sendMessage = async () => {
@@ -251,8 +265,11 @@
 
         sendButton.addEventListener('click', sendMessage);
         userInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && !event.shiftKey) {
                 sendMessage();
+                event.preventDefault();
+            } else if (event.key === 'Enter' && event.shiftKey) {
+                userInput.value += '\n';
             }
         });
 
@@ -261,7 +278,7 @@
             messageDiv.className = `message ${sender}`;
             const textDiv = document.createElement('div');
             textDiv.className = 'text';
-            textDiv.textContent = text;
+            textDiv.innerHTML = marked.parse(text);
             messageDiv.appendChild(textDiv);
             chatThread.appendChild(messageDiv);
             chatThread.scrollTop = chatThread.scrollHeight;
