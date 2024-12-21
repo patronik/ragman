@@ -34,8 +34,9 @@
 - Document embedding: Similar documents are embedded into user prompt and sent to OpenAI completion API.
 ### Chat
 - Chat interface: Simple chat iterface, where you can have your conersation with LLM.
+- Different conversation scenarios: You can ask chatbot to act according to specific role in order to achieve desired conversation outcome.
 - Coversation history: The app keeps conversation history in database that is sent to LLM along with last received promp.   
-- Topic specific conversation: You can configure a conversation category to filter out non relevant documents from conversation.
+- Topic specific knowledge base: You can select a knowledge category to filter out non relevant documents from conversation context.
 
 ## Installation
 
@@ -150,14 +151,39 @@ curl -X POST http://localhost:<YOUR EMBEDDING APP PORT NUMBER>/vector/create -H 
     "metadata" : {"categories": "Generative AI, AI powered chatbot, RAG chatbot"}
 }'
 ```
+Make sure that conversation scenarios are configured in chatbot app configuration. See example:
+```yaml
+chat:
+  scenarios:
+    - key: "default"
+      label: "Default"
+    - key: "scenario1"
+      label: "Scenario 1"
+    - key: "scenario2"
+      label: "Scenario 2"
+
+```
 Make sure that conversation scenario messages are configured in chatbot app configuration. See example:
 ```yaml
 chat:
   messages:
-    scenario: 
+    default: 
       system: "System message that contains general LLM instructions."
       prompt: "User Query: %s."
       document: "Documents: %s."
+
+```
+Make sure that knowledge base categories are configured in chatbot app configuration. See example:
+```yaml
+chat:
+  rag:
+    categories:
+      - key: "general"
+        label: "General"
+      - key: "technical"
+        label: "Technical"
+      - key: "finance"
+        label: "Finance"
 
 ```
 ### 2. Go to `http://localhost:<YOUR CHATBOT APP PORT NUMBER>/chat` to start chat conversation
