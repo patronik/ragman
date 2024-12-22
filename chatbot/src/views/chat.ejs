@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= chatbotName %></title>
+    <title><%= chatName %></title>
     <link rel="stylesheet" href="<%= baseUrl %>/chat.css">    
      <!-- Include Highlight.js and Marked.js -->
      <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
@@ -11,7 +11,7 @@
 </head>
 <body>
     <div class="chatbot-container">
-        <div class="chatbot-header"><%= chatbotName %></div>
+        <div class="chatbot-header"><%= chatName %></div>
         <div class="chat-thread" id="chat-thread">
             <!-- Messages will be dynamically added here -->
         </div>
@@ -19,6 +19,15 @@
             <label> Scenario
                 <select id="chat-scenario">
                     <% scenarios.forEach((item) => { %>
+                        <option value="<%= item.key %>" <% if(item.key == scenario) { %> selected <% } %>>
+                            <%= item.label %>
+                        </option>
+                    <% }); %>
+                </select>                      
+            </label>
+            <label> Model
+                <select id="chat-model">
+                    <% aiModels.forEach((item) => { %>
                         <option value="<%= item.key %>"><%= item.label %></option>
                     <% }); %>
                 </select>                      
@@ -54,6 +63,20 @@
         const sendButton = document.getElementById('send-button');
         const userInput = document.getElementById('user-input');
         const chatScenario = document.getElementById('chat-scenario');
+        chatScenario.addEventListener('change', async () => {
+            const response = await fetch('<%= baseUrl %>/set-scenario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    scenario: chatScenario.value,
+                })
+            });
+            window.location.reload();
+        });
+
+        const chatModel = document.getElementById('chat-model');
 
         const useKnowledgeBase = document.getElementById('use-knowledge-base');                 
         useKnowledgeBase.addEventListener('change', () => {
@@ -70,7 +93,7 @@
             highlight: (code, lang) => {
                 return hljs.highlightAuto(code, lang ? [lang] : undefined).value;
             }
-        });
+        });      
 
         const sendMessage = async () => {
             const messageText = userInput.value.trim();
@@ -87,6 +110,7 @@
                         body: JSON.stringify({ 
                             prompt: messageText,
                             scenario: chatScenario.value,
+                            model: chatModel.value, 
                             rag: {
                               enabled: useKnowledgeBase.checked,
                               category: knowledgeCategory.value,
@@ -97,12 +121,12 @@
 
                     if (response.ok) {
                         const data = await response.json();
-                        addMessage('bot', data.response || 'No response');
+                        addMessage('assistant', data.response || 'No response');
                     } else {
-                        addMessage('bot', 'Error: Unable to reach the server');
+                        addMessage('assistant', 'Error: Unable to reach the server');
                     }
                 } catch (error) {
-                    addMessage('bot', 'Error: An unexpected error occurred');
+                    addMessage('assistant', 'Error: An unexpected error occurred');
                 }
             }
         };
@@ -126,7 +150,12 @@
             messageDiv.appendChild(textDiv);
             chatThread.appendChild(messageDiv);
             chatThread.scrollTop = chatThread.scrollHeight;
-        }
-    </script>
+        }                
+    </script>            
+    <% chatHistory.forEach((item) => { %>            
+        <script>
+            addMessage('<%= item.role %>', `<%= item.content %>`);
+        </script>
+    <% }); %>    
 </body>
 </html>

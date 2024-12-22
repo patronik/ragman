@@ -4,7 +4,6 @@ embedding:
   api_url: "http://embedding-app:5000"
 openai:
   api_key: "<YOUR OPENAI API KEY>"
-  completion_model: "gpt-4"
 chat:
   name: 'Ragman | Demo'
   scenarios:
@@ -14,6 +13,19 @@ chat:
       label: "Scenario 1"
     - key: "scenario2"
       label: "Scenario 2"
+    - key: "scenario3"
+      label: "Scenario 3"
+  models:  
+    - key: "gpt-4"
+      label: "gpt-4"
+    - key: "gpt-4o"
+      label: "gpt-4o"
+    - key: "gpt-4o-mini"
+      label: "gpt-4o-mini"
+    - key: "o1"
+      label: "o1"
+    - key: "o1-mini"
+      label: "o1-mini"
   messages:
     default:
       system: |

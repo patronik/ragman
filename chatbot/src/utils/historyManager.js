@@ -2,15 +2,15 @@ import config from '../config.js';
 import { pool } from '../db.js';
 
 // Save chat history to the database
-async function saveChatHistory(userId, prompt, response) {
+async function saveChatHistory(userId, scenario, prompt, response) {
     const now = new Date();
     
     try {
         // Insert prompt and response into the database
         await pool.query(
-            `INSERT INTO chat_history (user_id, role, content, timestamp) VALUES 
-             ($1, $2, $3, $4), ($1, $5, $6, $4)`,
-            [userId, 'user', prompt, now, 'assistant', response]
+            `INSERT INTO chat_history (user_id, scenario, role, content, timestamp) VALUES 
+             ($1, $2, $3, $4, $5), ($1, $2, $6, $7, $5)`,
+            [userId, scenario, 'user', prompt, now, 'assistant', response]
         );
 
         // Clean up expired history
@@ -21,7 +21,7 @@ async function saveChatHistory(userId, prompt, response) {
 }
 
 // Retrieve chat history from the database
-async function getChatHistory(userId) {
+async function getChatHistory(userId, scenario) {
     try {
         // Delete expired history
         await cleanupExpiredHistory();
@@ -30,8 +30,9 @@ async function getChatHistory(userId) {
         const res = await pool.query(
             `SELECT role, content FROM chat_history 
              WHERE user_id = $1 
+             AND scenario = $2
              ORDER BY timestamp ASC`,
-            [userId]
+            [userId, scenario]
         );
         
         return res.rows.map(row => ({ role: row.role, content: row.content }));

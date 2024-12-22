@@ -40,7 +40,7 @@ body {
     align-self: flex-end;
     color: white;
 }
-.message.bot .text {
+.message.assistant .text {
     background-color: #333344;
     color: #b0b0b0;
 }

@@ -1,16 +1,12 @@
-import config from '../config.js';
+import config  from '../config.js';
 import { sprintf } from 'sprintf-js';
 import { OpenAI }  from 'openai';
 
-if (!config.openai.api_key
-    || !config.openai.completion_model  
-) {
+if (!config.openai.api_key) {
   throw new Error('OpenAI configuration is missing.');  
 }
 
-const openai = new OpenAI({
-    apiKey: config.openai.api_key
-});
+const openai = new OpenAI({apiKey: config.openai.api_key});
 
 function ucFirst(str) {
   return String(str).charAt(0).toUpperCase() + String(str).slice(1);
@@ -32,7 +28,7 @@ function prepareDocuments(documents)
     .join("\n\n");
 }
 
-function getChatMessages(history, prompt, documents, scenario) {        
+function getChatMessages(chatHistory, prompt, documents, scenario) {        
     const documentContext = prepareDocuments(documents);    
 
     if (!config.chat.messages[scenario].system
@@ -43,7 +39,7 @@ function getChatMessages(history, prompt, documents, scenario) {
     }
 
     let messages = [
-        ...history,
+        ...chatHistory,
         {
           role: "system",
           content: sprintf(config.chat.messages[scenario].system),
@@ -66,12 +62,9 @@ function getChatMessages(history, prompt, documents, scenario) {
     return messages;
 }
 
-async function getChatResponse({ history, prompt, documents, scenario }) {
-    const messages = getChatMessages(history, prompt, documents, scenario);
-    const response = await openai.chat.completions.create({
-        model: config.openai.completion_model,
-        messages
-    });
+async function getChatResponse({ chatHistory, prompt, documents, scenario, model }) {
+    const messages = getChatMessages(chatHistory, prompt, documents, scenario);
+    const response = await openai.chat.completions.create({ model, messages });
     return response.choices[0].message.content;
 }
 

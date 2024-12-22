@@ -84,7 +84,6 @@ embedding:
   api_url: "http://embedding-app:<EMBEDDING APP PORT NUMBER>"
 openai:
   api_key: "<YOUR OPENAI API KEY>"
-  completion_model: "gpt-4"
 chat:
   name: 'Ragman | Demo'
   scenarios:
@@ -94,6 +93,8 @@ chat:
       label: "Scenario 1"
     - key: "scenario2"
       label: "Scenario 2"
+    - key: "scenario3"
+      label: "Scenario 3" 
   messages:
     default:
       system: |
@@ -161,7 +162,8 @@ chat:
       label: "Scenario 1"
     - key: "scenario2"
       label: "Scenario 2"
-
+    - key: "scenario3"
+      label: "Scenario 3" 
 ```
 Make sure that conversation scenario messages are configured in chatbot app configuration. See example:
 ```yaml

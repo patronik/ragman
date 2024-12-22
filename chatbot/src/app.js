@@ -27,10 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(
 session({
         secret: config.session.secret, 
-        resave: config.session.resave 
-            ? config.session.resave == "true" : false,
-        saveUninitialized: config.session.saveUninitialized 
-            ? config.session.saveUninitialized == "true" : true,
+        resave: config.session.resave ? config.session.resave == "true" : false,
+        saveUninitialized: config.session.saveUninitialized ? config.session.saveUninitialized == "true" : true,
         cookie: { maxAge: config.session.maxAge || 600000 } 
     })
 );
@@ -39,19 +37,23 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/chat', async (req, res) => {
+    const baseUrl =  config.base_url || 'http://localhost:4000'
+    const chatName = config.chat.name || 'Ragman | Demo';        
+    const scenarios = config.chat.scenarios || [{key: "default", label:"Default"}];
+    const scenario =  req.session.scenario || scenarios[0].key;
+    const aiModels = config.chat.models || [{key: "gpt-4", label:"gpt-4"}];
+    const categories = config.chat.rag.categories || [{key: "general", label:"General"}];
+    let chatHistory = [];
+    if (req.session.userId && req.session.scenario) {
+        chatHistory = await getChatHistory(req.session.userId, req.session.scenario);
+    }        
     res.render(
-        'chat', 
-        {            
-            baseUrl: config.base_url,
-            chatbotName: config.chat.name || 'Ragman | Demo',
-            scenarios: config.chat.scenarios || [{key: "default", label:"Default"}],
-            categories: config.chat.rag.categories || [{key: "general", label:"General"}],
-        }
+        'chat', { baseUrl, chatName, scenarios, scenario, aiModels, categories, chatHistory }
     );
 });
 
 app.post('/chat', async (req, res) => {
-    const { prompt, scenario, rag } = req.body;
+    const { prompt, scenario, model, rag } = req.body;
 
     if (!prompt) {
         return res.status(400).send({ error: 'Missing prompt.' });
@@ -61,32 +63,54 @@ app.post('/chat', async (req, res) => {
         throw new Error('Conversation scenario is not provided.');
     }   
 
-    let userId = req.body.userId;
+    if (!model) {
+        throw new Error('AI model is not provided.');
+    }  
+
+    let userId = req.body.userId || req.session.id;
     if (!userId) {
-        if (req.session.id) {
-            userId = req.session.id;
-        } else {
-            throw new Error('Failed to identify the user.');
-        }
+        throw new Error('Failed to identify the user.');
     }   
 
     try {
-        const history = await getChatHistory(`${userId}_${scenario}`);
+        const chatHistory = await getChatHistory(userId, scenario);        
 
         let documents = [];
         if (rag.enabled) {
             documents = await getSimilarDocuments(prompt, rag.category, rag.limit);
         }
 
-        const response = await getChatResponse({ history, prompt, documents, scenario });
+        const response = await getChatResponse({ chatHistory, prompt, documents, scenario, model });
 
-        saveChatHistory(userId, prompt, response);
+        saveChatHistory(userId, scenario, prompt, response);        
+
+        req.session.userId = userId;
+        req.session.scenario = scenario;
 
         res.send({ response });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send({ error: 'Internal Server Error' });
     }
+});
+
+app.post('/set-scenario', async (req, res) => {
+    const { scenario } = req.body;
+
+    let found = false;
+    let scenarios = config.chat.scenarios || [];
+    for (let element of scenarios) {
+        if (element.key == scenario) {   
+            found = true;         
+        }
+    }    
+
+    if (!found) {
+        throw new Error(`Selected scenario is not configured.`);
+    }
+
+    req.session.scenario = scenario;    
+    res.send({ "response": "ok" });
 });
 
 const PORT = config.port || 4000;
