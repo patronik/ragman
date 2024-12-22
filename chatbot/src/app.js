@@ -38,17 +38,41 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.get('/chat', async (req, res) => {
     const baseUrl =  config.base_url || 'http://localhost:4000'
-    const chatName = config.chat.name || 'Ragman | Demo';        
+    const chatName = config.chat.name || 'Ragman | Demo'; 
+
     const scenarios = config.chat.scenarios || [{key: "default", label:"Default"}];
     const scenario =  req.session.scenario || scenarios[0].key;
-    const aiModels = config.chat.models || [{key: "gpt-4", label:"gpt-4"}];
+
+    const models = config.chat.models || [{key: "gpt-4", label:"gpt-4"}];
+    const model = req.session.model || models[0].key;
+
+    const useRAG = req.session.useRAG || false;  
+
     const categories = config.chat.rag.categories || [{key: "general", label:"General"}];
+    const category = req.session.category || categories[0].key;
+
+    const documentLimits = config.chat.rag.limits || [5, 10, 15] 
+    const documentLimit = req.session.documentLimit || documentLimits[0];
+
     let chatHistory = [];
     if (req.session.userId && req.session.scenario) {
         chatHistory = await getChatHistory(req.session.userId, req.session.scenario);
     }        
     res.render(
-        'chat', { baseUrl, chatName, scenarios, scenario, aiModels, categories, chatHistory }
+        'chat', { 
+            baseUrl, 
+            chatName, 
+            scenarios, 
+            scenario, 
+            models, 
+            model, 
+            useRAG, 
+            categories, 
+            category, 
+            documentLimits,
+            documentLimit,
+            chatHistory 
+        }
     );
 });
 
@@ -110,6 +134,56 @@ app.post('/set-scenario', async (req, res) => {
     }
 
     req.session.scenario = scenario;    
+    res.send({ "response": "ok" });
+});
+
+app.post('/set-model', async (req, res) => {
+    const { model } = req.body;
+
+    let found = false;
+    let models = config.chat.models || [];
+    for (let element of models) {
+        if (element.key == model) {   
+            found = true;         
+        }
+    }    
+
+    if (!found) {
+        throw new Error(`Selected model is not configured.`);
+    }
+
+    req.session.model = model;    
+    res.send({ "response": "ok" });
+});
+
+app.post('/set-use-rag', async (req, res) => {
+    const { useRAG } = req.body;
+    req.session.useRAG = useRAG;    
+    res.send({ "response": "ok" });
+});
+
+app.post('/set-rag-category', async (req, res) => {
+    const { category } = req.body;
+
+    let found = false;
+    let categories = config.chat.rag.categories || [];
+    for (let element of categories) {
+        if (element.key == category) {   
+            found = true;         
+        }
+    }    
+
+    if (!found) {
+        throw new Error(`Selected category is not configured.`);
+    }
+
+    req.session.category = category;    
+    res.send({ "response": "ok" });
+});
+
+app.post('/set-document-limit', async (req, res) => {
+    const { documentLimit } = req.body;
+    req.session.documentLimit = documentLimit;    
     res.send({ "response": "ok" });
 });
 

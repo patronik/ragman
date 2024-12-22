@@ -93,8 +93,6 @@ chat:
       label: "Scenario 1"
     - key: "scenario2"
       label: "Scenario 2"
-    - key: "scenario3"
-      label: "Scenario 3" 
   messages:
     default:
       system: |
@@ -162,8 +160,7 @@ chat:
       label: "Scenario 1"
     - key: "scenario2"
       label: "Scenario 2"
-    - key: "scenario3"
-      label: "Scenario 3" 
+
 ```
 Make sure that conversation scenario messages are configured in chatbot app configuration. See example:
 ```yaml

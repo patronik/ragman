@@ -27,27 +27,33 @@
             </label>
             <label> Model
                 <select id="chat-model">
-                    <% aiModels.forEach((item) => { %>
-                        <option value="<%= item.key %>"><%= item.label %></option>
+                    <% models.forEach((item) => { %>
+                        <option value="<%= item.key %>" <% if(item.key == model) { %> selected <% } %>>
+                            <%= item.label %>
+                        </option>
                     <% }); %>
                 </select>                      
             </label>
             <span class="knowledge-base">
                 <label>
-                    <input type="checkbox" id="use-knowledge-base"> Use Knowledge Base
+                    <input type="checkbox" id="use-knowledge-base" <% if(useRAG == true) { %> checked <% } %>> Use Knowledge Base
                 </label>
                 <label> Category
-                    <select class="knowledge-base-options" disabled id="knowledge-category">
+                    <select class="knowledge-base-options" <% if(useRAG != true) { %> disabled <% } %> id="knowledge-category">
                         <% categories.forEach((item) => { %>
-                            <option value="<%= item.key %>"><%= item.label %></option>
+                            <option value="<%= item.key %>" <% if(item.key == category) { %> selected <% } %>>
+                                <%= item.label %>
+                            </option>
                         <% }); %>                    
                     </select>
                 </label>
                 <label> Document limit
-                    <select class="knowledge-base-options" disabled id="document-limit">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
+                    <select class="knowledge-base-options" <% if(useRAG != true) { %> disabled <% } %> id="document-limit">                        
+                        <% documentLimits.forEach((item) => { %>
+                            <option value="<%= item %>" <% if(item == documentLimit) { %> selected <% } %>>
+                                <%= item %>
+                            </option>
+                        <% }); %>    
                     </select>            
                 </label>
             </span>    
@@ -62,9 +68,10 @@
         const chatThread = document.getElementById('chat-thread');
         const sendButton = document.getElementById('send-button');
         const userInput = document.getElementById('user-input');
+
         const chatScenario = document.getElementById('chat-scenario');
         chatScenario.addEventListener('change', async () => {
-            const response = await fetch('<%= baseUrl %>/set-scenario', {
+            await fetch('<%= baseUrl %>/set-scenario', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -77,16 +84,60 @@
         });
 
         const chatModel = document.getElementById('chat-model');
+        chatModel.addEventListener('change', async () => {
+            await fetch('<%= baseUrl %>/set-model', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    model: chatModel.value,
+                })
+            });            
+        });
 
         const useKnowledgeBase = document.getElementById('use-knowledge-base');                 
-        useKnowledgeBase.addEventListener('change', () => {
+        useKnowledgeBase.addEventListener('change', async () => {      
+            const useRAG = useKnowledgeBase.checked ? true : false;      
             for (let element of document.getElementsByClassName('knowledge-base-options')) {
-                element.disabled = useKnowledgeBase.checked ? false : true;     
-            }            
+                element.disabled = !useRAG;     
+            }
+            await fetch('<%= baseUrl %>/set-use-rag', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    useRAG,
+                })
+            });                             
         });
 
         const knowledgeCategory = document.getElementById('knowledge-category');
+        knowledgeCategory.addEventListener('change', async () => {
+            await fetch('<%= baseUrl %>/set-rag-category', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    category: knowledgeCategory.value,
+                })
+            });            
+        });
+
         const documentLimit = document.getElementById('document-limit');      
+        documentLimit.addEventListener('change', async () => {      
+            await fetch('<%= baseUrl %>/set-document-limit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    documentLimit: documentLimit.value,
+                })
+            });                             
+        });
         
         // Configure syntax highliting
         marked.setOptions({

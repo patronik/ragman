@@ -51,6 +51,10 @@ chat:
         label: "Technical"
       - key: "finance"
         label: "Finance"
+    limits:
+      - 5
+      - 10
+      - 15
   history:
     expiration_hours: 24
 session:
