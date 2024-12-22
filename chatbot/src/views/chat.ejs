@@ -4,161 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= chatbotName %></title>
-    <style>
-         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #1e1e2f;
-            color: #b0b0b0;
-        }
-        .chatbot-container {
-            max-width: 1350px; 
-            margin: 75px auto;
-            background: #28293d;
-            box-shadow: 0 6px 9px rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            overflow: hidden;
-        }
-        .chatbot-header {
-            background-color: #333344;
-            color: white;
-            text-align: center;
-            padding: 22.5px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .chat-thread {
-            max-height: 600px;
-            overflow-y: auto;
-            padding: 30px;
-            background-color: #1e1e2f;
-        }
-        .message {
-            margin-bottom: 22.5px;
-            display: flex;
-            align-items: flex-start;
-        }
-        .message.user {
-            justify-content: flex-end;
-        }
-        .message.user .text {
-            background-color: #444455;
-            align-self: flex-end;
-            color: white;
-        }
-        .message.bot .text {
-            background-color: #333344;
-            color: #b0b0b0;
-        }
-        .text {
-            padding: 15px 22.5px;
-            border-radius: 22.5px;
-            max-width: 70%;
-            word-wrap: break-word;
-            font-size: 16px;
-        }
-        .input-container {
-            display: flex;
-            padding: 15px;
-            background-color: #28293d;
-            border-top: 1px solid #444455;
-        }
-        .input-container textarea {
-            flex: 1;
-            padding: 15px;
-            border: 1.5px solid #444455;
-            border-radius: 7.5px;
-            font-size: 16px;
-            background-color: #1e1e2f;
-            color: white;
-            resize: none;
-            height: 50px;
-        }
-        .input-container button {
-            margin-left: 15px;
-            padding: 15px 22.5px;
-            background-color: #56567d;
-            color: white;
-            border: none;
-            border-radius: 7.5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .input-container button:hover {
-            background-color: #454566;
-        }
-        .controls {
-            padding: 15px;
-            background-color: #28293d;
-            border-top: 1px solid #444455;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .controls select, .controls label {
-            font-size: 16px;
-            color: #b0b0b0;
-        }
-        #knowledge-base-options {
-            display: none;
-        }
-        .controls label{
-            padding-left:5px;
-            min-height: 22px;
-        }
-        /* Media Queries */
-        @media (max-width: 768px) {
-            .chatbot-container {
-                max-width: 95%;
-                margin: 50px auto;
-            }
-            .chatbot-header {
-                font-size: 22px;
-                padding: 15px;
-            }
-            .chat-thread {
-                max-height: 400px;
-                padding: 20px;
-            }
-            .text {
-                padding: 10px 15px;
-                font-size: 16px;
-            }
-            .input-container textarea {
-                font-size: 18px;
-                padding: 10px;
-            }
-            .input-container button {
-                font-size: 18px;
-                padding: 10px 15px;
-            }
-            .controls select, .controls label {
-                font-size: 18px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .chatbot-header {
-                font-size: 18px;
-            }
-            .chat-thread {
-                max-height: 300px;
-            }
-            .text {
-                font-size: 14px;
-            }
-            .input-container textarea {
-                font-size: 16px;
-            }
-            .input-container button {
-                font-size: 16px;
-            }
-            .controls select, .controls label {
-                font-size: 16px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="<%= baseUrl %>/chat.css">    
      <!-- Include Highlight.js and Marked.js -->
      <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script> 
@@ -170,35 +16,33 @@
             <!-- Messages will be dynamically added here -->
         </div>
         <div class="controls">
-            <label> Chat scenario
+            <label> Scenario
                 <select id="chat-scenario">
                     <% scenarios.forEach((item) => { %>
                         <option value="<%= item.key %>"><%= item.label %></option>
                     <% }); %>
                 </select>                      
             </label>
-        </div>
-        <div class="controls">            
-            <label>
-                <input type="checkbox" id="knowledge-base"> Use Knowledge Base
-            </label>
-            <span id="knowledge-base-options">
+            <span class="knowledge-base">
+                <label>
+                    <input type="checkbox" id="use-knowledge-base"> Use Knowledge Base
+                </label>
                 <label> Category
-                    <select id="knowledge-category">
+                    <select class="knowledge-base-options" disabled id="knowledge-category">
                         <% categories.forEach((item) => { %>
                             <option value="<%= item.key %>"><%= item.label %></option>
                         <% }); %>                    
                     </select>
                 </label>
                 <label> Document limit
-                    <select id="document-limit">
+                    <select class="knowledge-base-options" disabled id="document-limit">
                         <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="15">15</option>
                     </select>            
-                </label> 
-            </span>            
-        </div>
+                </label>
+            </span>    
+        </div>        
         <div class="input-container">
             <textarea id="user-input" placeholder="Type your message here..."></textarea>
             <button id="send-button">Send</button>
@@ -209,17 +53,17 @@
         const chatThread = document.getElementById('chat-thread');
         const sendButton = document.getElementById('send-button');
         const userInput = document.getElementById('user-input');
-
         const chatScenario = document.getElementById('chat-scenario');
 
-        const knowledgeBase = document.getElementById('knowledge-base');
-        const knowledgeCategory = document.getElementById('knowledge-category');
-        const documentLimit = document.getElementById('document-limit');                
-
-        knowledgeBase.addEventListener('change', () => {
-            document.getElementById('knowledge-base-options').style.display 
-            = knowledgeBase.checked ? 'inline-block' : 'none';            
+        const useKnowledgeBase = document.getElementById('use-knowledge-base');                 
+        useKnowledgeBase.addEventListener('change', () => {
+            for (let element of document.getElementsByClassName('knowledge-base-options')) {
+                element.disabled = useKnowledgeBase.checked ? false : true;     
+            }            
         });
+
+        const knowledgeCategory = document.getElementById('knowledge-category');
+        const documentLimit = document.getElementById('document-limit');      
         
         // Configure syntax highliting
         marked.setOptions({
