@@ -99,6 +99,85 @@ body {
 .knowledge-base label {    
     padding-left: 10px;
 }
+
+/* Overlay covering the screen */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Dark overlay with transparency */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    z-index: 1000; /* Ensure it's above other elements */
+}
+
+/* Modal container */
+.modal {
+    background: #2c2f33; /* Dark gray background */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+    width: 300px;
+    text-align: center;
+    color: #ffffff; /* White text */
+    font-family: Arial, sans-serif;
+    z-index: 1001;
+}
+
+/* Buttons container */
+.modal-buttons button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+}
+
+/* Confirm button styling */
+#clearConfirm {
+    background: #4caf50; /* Green */
+    color: #ffffff;
+}
+
+#clearConfirm:hover {
+    background: #45a049;
+    transform: scale(1.05);
+}
+
+/* Cancel button styling */
+#clearCancel {
+    background: #f44336; /* Red */
+    color: #ffffff;
+}
+
+#clearCancel:hover {
+    background: #d32f2f;
+    transform: scale(1.05);
+}
+
+/* Trigger button styling */
+.trigger-button {
+    background: #7289da; /* Soft blue */
+    color: #ffffff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.trigger-button:hover {
+    background: #5b6eae;
+    transform: scale(1.05);
+}
+
 /* Media Queries */
 @media (max-width: 768px) {
     .chatbot-container {

@@ -10,6 +10,15 @@
      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script> 
 </head>
 <body>
+    <div id="clearModalOverlay" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <p>Are you sure you want to clear this chat thread?</p>
+            <div class="modal-buttons">
+                <button id="clearConfirm">Yes</button>
+                <button id="clearCancel">No</button>
+            </div>
+        </div>
+    </div>
     <div class="chatbot-container">
         <div class="chatbot-header"><%= chatName %></div>
         <div class="chat-thread" id="chat-thread">
@@ -49,8 +58,8 @@
                 </label>
                 <label> Document limit
                     <select class="knowledge-base-options" <% if(useRAG != true) { %> disabled <% } %> id="document-limit">                        
-                        <% documentLimits.forEach((item) => { %>
-                            <option value="<%= item %>" <% if(item == documentLimit) { %> selected <% } %>>
+                        <% docLimits.forEach((item) => { %>
+                            <option value="<%= item %>" <% if(item == docLimit) { %> selected <% } %>>
                                 <%= item %>
                             </option>
                         <% }); %>    
@@ -60,13 +69,12 @@
         </div>        
         <div class="input-container">
             <textarea id="user-input" placeholder="Type your message here..."></textarea>
+            <button id="clear-button">Clear</button>
             <button id="send-button">Send</button>
-        </div>
+        </div>        
     </div>
-
     <script>
         const chatThread = document.getElementById('chat-thread');
-        const sendButton = document.getElementById('send-button');
         const userInput = document.getElementById('user-input');
 
         const chatScenario = document.getElementById('chat-scenario');
@@ -126,15 +134,15 @@
             });            
         });
 
-        const documentLimit = document.getElementById('document-limit');      
-        documentLimit.addEventListener('change', async () => {      
+        const docLimit = document.getElementById('document-limit');      
+        docLimit.addEventListener('change', async () => {      
             await fetch('<%= baseUrl %>/set-document-limit', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    documentLimit: documentLimit.value,
+                    docLimit: docLimit.value,
                 })
             });                             
         });
@@ -165,7 +173,7 @@
                             rag: {
                               enabled: useKnowledgeBase.checked,
                               category: knowledgeCategory.value,
-                              limit: documentLimit.value,
+                              limit: docLimit.value,
                             }
                         })
                     });
@@ -181,7 +189,8 @@
                 }
             }
         };
-
+        
+        const sendButton = document.getElementById('send-button');
         sendButton.addEventListener('click', sendMessage);
         userInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -191,7 +200,29 @@
                 userInput.value += '\n';
             }
         });
+        
+        const clearButton = document.getElementById('clear-button');
+        clearButton.addEventListener('click', () => {      
+            document.getElementById('clearModalOverlay').style.display = 'flex';                                
+        });   
 
+        document.getElementById('clearConfirm').addEventListener('click', async () => {
+            await fetch('<%= baseUrl %>/clear-history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    scenario: chatScenario.value
+                })
+            });   
+            window.location.reload();             
+        });
+
+        document.getElementById('clearCancel').addEventListener('click', () => {            
+            document.getElementById('clearModalOverlay').style.display = 'none';
+        });
+        
         function addMessage(sender, text) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
@@ -201,7 +232,7 @@
             messageDiv.appendChild(textDiv);
             chatThread.appendChild(messageDiv);
             chatThread.scrollTop = chatThread.scrollHeight;
-        }                
+        }   
     </script>            
     <% chatHistory.forEach((item) => { %>            
         <script>

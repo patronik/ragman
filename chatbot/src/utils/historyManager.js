@@ -42,6 +42,18 @@ async function getChatHistory(userId, scenario) {
     }
 }
 
+// Clear chat history by user id and scenario
+async function clearChatHistory(userId, scenario) {
+    try {            
+        await pool.query(
+            `DELETE FROM chat_history WHERE user_id = $1 AND scenario = $2`,
+            [userId, scenario]
+        );            
+    } catch (err) {
+        console.error('Error clearing chat history:', err);        
+    }
+}
+
 // Remove expired chat history (older than 24 hours)
 async function cleanupExpiredHistory() {
     try {
@@ -54,4 +66,4 @@ async function cleanupExpiredHistory() {
     }
 }
 
-export { saveChatHistory, getChatHistory };
+export { saveChatHistory, getChatHistory, clearChatHistory };

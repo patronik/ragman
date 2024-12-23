@@ -3,7 +3,7 @@ import express from 'express';
 import session from 'express-session';
 import { getSimilarDocuments } from './services/documentService.js';
 import { getChatResponse } from './services/chatService.js';
-import { saveChatHistory, getChatHistory } from './utils/historyManager.js';
+import { saveChatHistory, getChatHistory, clearChatHistory } from './utils/historyManager.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -51,8 +51,8 @@ app.get('/chat', async (req, res) => {
     const categories = config.chat.rag.categories || [{key: "general", label:"General"}];
     const category = req.session.category || categories[0].key;
 
-    const documentLimits = config.chat.rag.limits || [5, 10, 15] 
-    const documentLimit = req.session.documentLimit || documentLimits[0];
+    const docLimits = config.chat.rag.limits || [5, 10, 15] 
+    const docLimit = req.session.docLimit || docLimits[0];
 
     let chatHistory = [];
     if (req.session.userId && req.session.scenario) {
@@ -69,8 +69,8 @@ app.get('/chat', async (req, res) => {
             useRAG, 
             categories, 
             category, 
-            documentLimits,
-            documentLimit,
+            docLimits,
+            docLimit,
             chatHistory 
         }
     );
@@ -182,8 +182,25 @@ app.post('/set-rag-category', async (req, res) => {
 });
 
 app.post('/set-document-limit', async (req, res) => {
-    const { documentLimit } = req.body;
-    req.session.documentLimit = documentLimit;    
+    const { docLimit } = req.body;
+    req.session.docLimit = docLimit;    
+    res.send({ "response": "ok" });
+});
+
+app.post('/clear-history', async (req, res) => {
+    const { scenario } = req.body;
+
+    if (!scenario) {
+        throw new Error('Scenario is not provided.');
+    }
+
+    let userId = req.body.userId || req.session.id;
+    if (!userId) {
+        throw new Error('Failed to identify the user.');
+    }   
+
+    await clearChatHistory(userId, scenario);
+    
     res.send({ "response": "ok" });
 });
 
