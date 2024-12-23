@@ -1,10 +1,11 @@
 ## Ragman - is an open source AI powered chatbot, that provides the possibility to include your custom documents (RAG) in order to achive context specific question answering.
 
-### See how the response to the same question changed after single document has been indexed to vector database.
-
 <p align="center">
 <img src="https://voinatech.com/images/ragman.png" height="410px" width="700px" alt="Chat demo" />
 </p>
+
+## Live Demo
+Check out the live demo here: [Live Demo](https://ragman-demo.voinatech.com/chat)
 
 ## Tech Stack
 
