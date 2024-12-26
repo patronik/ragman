@@ -36,7 +36,7 @@ session({
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.get('/chat', async (req, res) => {
+const renderChat = async (req, res) => {
     const baseUrl =  config.base_url || 'http://localhost:4000'
     const chatName = config.chat.name || 'Ragman | Demo'; 
 
@@ -74,6 +74,14 @@ app.get('/chat', async (req, res) => {
             chatHistory 
         }
     );
+};
+
+app.get('/', async (req, res) => {
+    await renderChat(req, res);
+});
+
+app.get('/chat', async (req, res) => {
+    await renderChat(req, res);
 });
 
 app.post('/chat', async (req, res) => {
