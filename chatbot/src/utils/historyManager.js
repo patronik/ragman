@@ -8,9 +8,9 @@ async function saveChatHistory(userId, scenario, prompt, response) {
     try {
         // Insert prompt and response into the database
         await pool.query(
-            `INSERT INTO chat_history (user_id, scenario, role, content, timestamp) VALUES 
-             ($1, $2, $3, $4, $5), ($1, $2, $6, $7, $5)`,
-            [userId, scenario, 'user', prompt, now, 'assistant', response]
+            `INSERT INTO chat_history (user_id, scenario, role, content, is_deleted, timestamp) VALUES 
+             ($1, $2, $3, $4, $5, $6), ($1, $2, $7, $8, $5, $6)`,
+            [userId, scenario, 'user', prompt, false, now, 'assistant', response]
         );
 
         // Clean up expired history
@@ -31,8 +31,9 @@ async function getChatHistory(userId, scenario) {
             `SELECT role, content FROM chat_history 
              WHERE user_id = $1 
              AND scenario = $2
+             AND is_deleted = $3
              ORDER BY timestamp ASC`,
-            [userId, scenario]
+            [userId, scenario, false]
         );
         
         return res.rows.map(row => ({ role: row.role, content: row.content }));
@@ -46,8 +47,11 @@ async function getChatHistory(userId, scenario) {
 async function clearChatHistory(userId, scenario) {
     try {            
         await pool.query(
-            `DELETE FROM chat_history WHERE user_id = $1 AND scenario = $2`,
-            [userId, scenario]
+            `UPDATE chat_history 
+             SET is_deleted = $1 
+             WHERE user_id = $2 
+             AND scenario = $3`,
+            [true, userId, scenario]
         );            
     } catch (err) {
         console.error('Error clearing chat history:', err);        
@@ -58,8 +62,9 @@ async function clearChatHistory(userId, scenario) {
 async function cleanupExpiredHistory() {
     try {
         await pool.query(
-            `DELETE FROM chat_history 
-             WHERE timestamp < NOW() - INTERVAL '${config.chat.history.expiration_hours || 24} HOURS'`
+            `UPDATE chat_history SET is_deleted = $1 
+             WHERE timestamp < NOW() - INTERVAL '${config.chat.history.expiration_hours || 24} HOURS'`,
+             [true]
         );
     } catch (err) {
         console.error('Error cleaning up expired chat history:', err);
